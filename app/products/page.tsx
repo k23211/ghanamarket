@@ -30,6 +30,16 @@ export default function ProductsPage() {
     window.location.href = "/seller/dashboard";
   };
 
+  const addToCart = async (productId: string) => {
+    if (!user) { window.location.href = "/auth"; return; }
+    await supabase.from("cart_items").insert({
+      user_id: user.id,
+      product_id: productId,
+      quantity: 1,
+    });
+    window.location.href = "/cart";
+  };
+
   if (loading) return (
     <div className="min-h-screen flex items-center justify-center">
       <p className="text-green-700 font-bold">Loading...</p>
@@ -44,9 +54,14 @@ export default function ProductsPage() {
         </a>
         <div className="flex items-center gap-3">
           {user && (
-            <button onClick={switchToSeller} className="bg-yellow-400 text-green-900 px-3 py-2 rounded-full text-xs font-bold hover:bg-yellow-300">
-              🏪 Switch to Seller
-            </button>
+            <>
+              <a href="/cart" className="bg-gray-100 text-gray-800 px-3 py-2 rounded-full text-xs font-bold hover:bg-gray-200">
+                🛒 Cart
+              </a>
+              <button onClick={switchToSeller} className="bg-yellow-400 text-green-900 px-3 py-2 rounded-full text-xs font-bold hover:bg-yellow-300">
+                🏪 Switch to Seller
+              </button>
+            </>
           )}
           {user ? (
             <button onClick={handleSignOut} className="bg-red-500 text-white px-4 py-2 rounded-full text-sm font-semibold hover:bg-red-600">
@@ -73,7 +88,10 @@ export default function ProductsPage() {
                 <h3 className="font-bold text-gray-800 text-sm mb-1">{product.name}</h3>
                 <p className="text-xs text-gray-500 mb-2">{product.description}</p>
                 <p className="text-green-700 font-black">GH₵ {product.price}</p>
-                <button className="w-full mt-3 bg-green-700 text-white text-sm py-2 rounded-xl hover:bg-green-600">
+                <button
+                  onClick={() => addToCart(product.id)}
+                  className="w-full mt-3 bg-green-700 text-white text-sm py-2 rounded-xl hover:bg-green-600"
+                >
                   Add to Cart
                 </button>
               </div>
