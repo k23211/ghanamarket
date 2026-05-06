@@ -5,13 +5,13 @@ export default function Home() {
       <nav className="fixed top-0 w-full z-50 bg-white/90 backdrop-blur-md shadow-sm px-6 py-4 flex justify-between items-center">
         <h1 className="text-2xl font-black text-green-700">Ghana<span className="text-yellow-500">Market</span></h1>
         <div className="hidden md:flex gap-8 text-sm font-medium text-gray-600">
-          <a href="#" className="hover:text-green-700">Home</a>
-          <a href="#" className="hover:text-green-700">Products</a>
+          <a href="/" className="hover:text-green-700">Home</a>
+          <a href="/products" className="hover:text-green-700">Products</a>
           <a href="#" className="hover:text-green-700">About</a>
         </div>
-       <a href="/auth" className="bg-green-700 text-white px-4 py-2 rounded-full text-sm font-semibold hover:bg-green-600">
-  Sign In
-</a>
+        <a href="/auth" className="bg-green-700 text-white px-4 py-2 rounded-full text-sm font-semibold hover:bg-green-600">
+          Sign In
+        </a>
       </nav>
 
       {/* Hero */}
@@ -28,12 +28,12 @@ export default function Home() {
             Discover the finest kente, food, crafts and more — delivered straight to your door.
           </p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
-            <button className="bg-yellow-400 text-green-900 font-bold px-8 py-4 rounded-full text-lg hover:bg-yellow-300 shadow-lg">
+            <a href="/products" className="bg-yellow-400 text-green-900 font-bold px-8 py-4 rounded-full text-lg hover:bg-yellow-300 shadow-lg text-center">
               Shop Now
-            </button>
-            <button className="border-2 border-white text-white font-bold px-8 py-4 rounded-full text-lg hover:bg-white hover:text-green-900">
+            </a>
+            <a href="#" className="border-2 border-white text-white font-bold px-8 py-4 rounded-full text-lg hover:bg-white hover:text-green-900 text-center">
               Learn More
-            </button>
+            </a>
           </div>
         </div>
       </section>
@@ -43,10 +43,10 @@ export default function Home() {
         <h3 className="text-2xl md:text-3xl font-black text-center text-gray-800 mb-10">Shop by Category</h3>
         <div className="grid grid-cols-2 md:grid-cols-4 gap-4 max-w-4xl mx-auto">
           {["👗 Fashion", "🍱 Food", "💎 Jewelry", "🏺 Crafts"].map((cat) => (
-            <div key={cat} className="bg-white rounded-2xl p-5 text-center shadow hover:shadow-md cursor-pointer hover:-translate-y-1 transition-all">
+            <a href="/products" key={cat} className="bg-white rounded-2xl p-5 text-center shadow hover:shadow-md cursor-pointer hover:-translate-y-1 transition-all">
               <p className="text-3xl mb-2">{cat.split(" ")[0]}</p>
               <p className="font-semibold text-gray-700">{cat.split(" ")[1]}</p>
-            </div>
+            </a>
           ))}
         </div>
       </section>

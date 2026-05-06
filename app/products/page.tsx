@@ -7,15 +7,22 @@ export default async function ProductsPage() {
 
   return (
     <main className="min-h-screen bg-gray-50">
+      {/* Navbar */}
       <nav className="bg-white shadow-sm px-6 py-4 flex justify-between items-center">
         <a href="/" className="text-2xl font-black text-green-700">
           Ghana<span className="text-yellow-500">Market</span>
         </a>
+        <div className="hidden md:flex gap-8 text-sm font-medium text-gray-600">
+          <a href="/" className="hover:text-green-700">Home</a>
+          <a href="/products" className="hover:text-green-700">Products</a>
+          <a href="#" className="hover:text-green-700">About</a>
+        </div>
         <a href="/auth" className="bg-green-700 text-white px-4 py-2 rounded-full text-sm font-semibold hover:bg-green-600">
           Sign In
         </a>
       </nav>
 
+      {/* Products */}
       <section className="py-12 px-6 max-w-6xl mx-auto">
         <h2 className="text-3xl font-black text-gray-800 mb-8">All Products</h2>
         <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
@@ -37,6 +44,11 @@ export default async function ProductsPage() {
           ))}
         </div>
       </section>
+
+      {/* Footer */}
+      <footer className="bg-green-900 text-green-200 text-center py-6 text-sm">
+        © 2026 GhanaMarket. All rights reserved.
+      </footer>
     </main>
   );
 }
