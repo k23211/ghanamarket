@@ -1,4 +1,21 @@
+"use client";
+import { useState, useEffect } from "react";
+import { supabase } from "@/lib/supabase";
+
 export default function Home() {
+  const [user, setUser] = useState<any>(null);
+
+  useEffect(() => {
+    supabase.auth.getUser().then(({ data }) => {
+      setUser(data.user);
+    });
+  }, []);
+
+  const handleSignOut = async () => {
+    await supabase.auth.signOut();
+    setUser(null);
+  };
+
   return (
     <main className="min-h-screen bg-white">
       {/* Navbar */}
@@ -9,9 +26,21 @@ export default function Home() {
           <a href="/products" className="hover:text-green-700">Products</a>
           <a href="#" className="hover:text-green-700">About</a>
         </div>
-        <a href="/auth" className="bg-green-700 text-white px-4 py-2 rounded-full text-sm font-semibold hover:bg-green-600">
-          Sign In
-        </a>
+        {user ? (
+          <div className="flex items-center gap-3">
+            <span className="text-sm text-gray-600 hidden md:block">{user.email}</span>
+            <button
+              onClick={handleSignOut}
+              className="bg-red-500 text-white px-4 py-2 rounded-full text-sm font-semibold hover:bg-red-600"
+            >
+              Sign Out
+            </button>
+          </div>
+        ) : (
+          <a href="/auth" className="bg-green-700 text-white px-4 py-2 rounded-full text-sm font-semibold hover:bg-green-600">
+            Sign In
+          </a>
+        )}
       </nav>
 
       {/* Hero */}
