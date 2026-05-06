@@ -14,8 +14,8 @@ export default function AuthPage() {
     setMessage("");
     if (isLogin) {
       const { error } = await supabase.auth.signInWithPassword({ email, password });
-      if (error) setMessage(error.message);
-      else setMessage("Logged in successfully!");
+     if (error) setMessage(error.message);
+else window.location.href = "/";
     } else {
       const { error } = await supabase.auth.signUp({ email, password });
       if (error) setMessage(error.message);
