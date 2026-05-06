@@ -9,8 +9,9 @@ export default function Home() {
           <a href="#" className="hover:text-green-700">Products</a>
           <a href="#" className="hover:text-green-700">About</a>
         </div>
-        <button className="bg-green-700 text-white px-4 py-2 rounded-full text-sm font-semibold hover:bg-green-600">
-          Sign In
+       <a href="/auth" className="bg-green-700 text-white px-4 py-2 rounded-full text-sm font-semibold hover:bg-green-600">
+  Sign In
+</a>
         </button>
       </nav>
 
