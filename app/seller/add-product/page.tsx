@@ -7,8 +7,18 @@ export default function AddProduct() {
   const [description, setDescription] = useState("");
   const [price, setPrice] = useState("");
   const [category, setCategory] = useState("Fashion");
+  const [image, setImage] = useState<File | null>(null);
+  const [imagePreview, setImagePreview] = useState("");
   const [message, setMessage] = useState("");
   const [loading, setLoading] = useState(false);
+
+  const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (file) {
+      setImage(file);
+      setImagePreview(URL.createObjectURL(file));
+    }
+  };
 
   const handleSubmit = async () => {
     setLoading(true);
@@ -17,21 +27,41 @@ export default function AddProduct() {
     const { data: { user } } = await supabase.auth.getUser();
     if (!user) { window.location.href = "/auth"; return; }
 
+    let image_url = "";
+
+    if (image) {
+      const fileExt = image.name.split(".").pop();
+      const fileName = `${user.id}-${Date.now()}.${fileExt}`;
+      const { error: uploadError } = await supabase.storage
+        .from("products")
+        .upload(fileName, image);
+
+      if (uploadError) {
+        setMessage(uploadError.message);
+        setLoading(false);
+        return;
+      }
+
+      const { data: urlData } = supabase.storage
+        .from("products")
+        .getPublicUrl(fileName);
+
+      image_url = urlData.publicUrl;
+    }
+
     const { error } = await supabase.from("products").insert({
       name,
       description,
       price: parseFloat(price),
       category,
       seller_id: user.id,
+      image_url,
     });
 
     if (error) {
       setMessage(error.message);
     } else {
       window.location.href = "/seller/dashboard";
-      setName("");
-      setDescription("");
-      setPrice("");
     }
     setLoading(false);
   };
@@ -48,6 +78,23 @@ export default function AddProduct() {
       <div className="max-w-lg mx-auto px-6 py-8">
         <div className="bg-white rounded-2xl shadow p-6">
           <h2 className="text-2xl font-black text-gray-800 mb-6">Add New Product</h2>
+
+          <label className="text-sm text-gray-600 font-medium">Product Image</label>
+          <div className="mt-1 mb-4">
+            {imagePreview ? (
+              <img src={imagePreview} alt="Preview" className="w-full h-48 object-cover rounded-xl mb-2" />
+            ) : (
+              <div className="w-full h-48 bg-green-50 rounded-xl flex items-center justify-center mb-2">
+                <p className="text-gray-400 text-sm">No image selected</p>
+              </div>
+            )}
+            <input
+              type="file"
+              accept="image/*"
+              onChange={handleImageChange}
+              className="w-full text-sm text-gray-600"
+            />
+          </div>
 
           <label className="text-sm text-gray-600 font-medium">Product Name</label>
           <input
@@ -92,7 +139,7 @@ export default function AddProduct() {
           </select>
 
           {message && (
-            <p className="text-sm text-center mb-4 text-green-600">{message}</p>
+            <p className="text-sm text-center mb-4 text-red-500">{message}</p>
           )}
 
           <button

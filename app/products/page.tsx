@@ -80,9 +80,15 @@ export default function ProductsPage() {
         <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
           {products.map((product) => (
             <div key={product.id} className="bg-white rounded-2xl shadow hover:shadow-md transition-all overflow-hidden">
-              <div className="bg-green-100 h-40 flex items-center justify-center">
-                <span className="text-5xl">🛍️</span>
-              </div>
+              <div className="h-40 overflow-hidden">
+  {product.image_url ? (
+    <img src={product.image_url} alt={product.name} className="w-full h-full object-cover" />
+  ) : (
+    <div className="bg-green-100 h-full flex items-center justify-center">
+      <span className="text-5xl">🛍️</span>
+    </div>
+  )}
+</div>
               <div className="p-4">
                 <p className="text-xs text-green-700 font-semibold mb-1">{product.category}</p>
                 <h3 className="font-bold text-gray-800 text-sm mb-1">{product.name}</h3>
