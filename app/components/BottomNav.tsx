@@ -31,16 +31,17 @@ export default function BottomNav() {
 
     fetchUnread();
 
-    // Realtime: bump badge when a new message arrives
     const setup = async () => {
       const { data: { user } } = await supabase.auth.getUser();
       if (!user) return;
+
+      const filter = "receiver_id=eq." + user.id;
 
       const channel = supabase
         .channel("unread-badge")
         .on(
           "postgres_changes",
-          { event: "INSERT", schema: "public", table: "messages", filter: receiver_id=eq.${user.id} },
+          { event: "INSERT", schema: "public", table: "messages", filter: filter },
           () => setUnread(prev => prev + 1)
         )
         .subscribe();
@@ -84,7 +85,6 @@ export default function BottomNav() {
               {tab.label}
             </span>
 
-            {/* Unread badge on Chats tab */}
             {isChat && unread > 0 && (
               <span style={{
                 position: "absolute",
