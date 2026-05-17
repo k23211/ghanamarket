@@ -1,180 +1,258 @@
 "use client";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { supabase } from "@/lib/supabase";
 
+// ── Data ────────────────────────────────────────────────────────────────────
+
 const categories = [
-  { emoji: "👗", label: "Fashion", href: "/products?category=fashion" },
-  { emoji: "🍲", label: "Food", href: "/products?category=food" },
-  { emoji: "💎", label: "Jewelry", href: "/products?category=jewelry" },
-  { emoji: "🏺", label: "Crafts", href: "/products?category=crafts" },
+  { label: "Electronics", img: "https://images.unsplash.com/photo-1505740420928-5e560c06d30e?w=120&q=80" },
+  { label: "Fashion",     img: "https://images.unsplash.com/photo-1594938298603-c8148c4b4e74?w=120&q=80" },
+  { label: "Home & Living", img: "https://images.unsplash.com/photo-1555041469-a586c61ea9bc?w=120&q=80" },
+  { label: "Beauty",      img: "https://images.unsplash.com/photo-1596462502278-27bfdc403348?w=120&q=80" },
+  { label: "Groceries",   img: "https://images.unsplash.com/photo-1542838132-92c53300491e?w=120&q=80" },
 ];
 
 const features = [
-  { icon: "🏅", title: "100% Authentic" },
-  { icon: "🚚", title: "Fast Delivery" },
-  { icon: "🔒", title: "Secure Payments" },
-  { icon: "🎧", title: "24/7 Support" },
+  { icon: "🛡️", label: "Secure\nPayments" },
+  { icon: "🚚", label: "Fast\nDelivery" },
+  { icon: "🏅", label: "Quality\nProducts" },
+  { icon: "🎧", label: "24/7\nSupport" },
+  { icon: "⭐", label: "Top Deals\nEveryday" },
 ];
 
-const popularPicks = [
-  { name: "Kente Jacket", price: "GHS 350", category: "Fashion", color: "bg-blue-500", emoji: "🧥", rating: 5, reviews: 24 },
-  { name: "Natural Honey", price: "GHS 60", category: "Food", color: "bg-yellow-500", emoji: "🍯", rating: 5, reviews: 18 },
-  { name: "Beaded Bracelet", price: "GHS 45", category: "Jewelry", color: "bg-purple-500", emoji: "📿", rating: 5, reviews: 32 },
-  { name: "Carved Mask", price: "GHS 120", category: "Crafts", color: "bg-orange-500", emoji: "🗿", rating: 5, reviews: 15 },
+const featuredProducts = [
+  { name: "iPhone 14 Pro Max",      price: "GH₵ 8,999", rating: 4.8, reviews: 128, img: "https://images.unsplash.com/photo-1678685888221-cda773a3dcdb?w=200&q=80" },
+  { name: "Samsung Galaxy Watch 6", price: "GH₵ 1,850", rating: 4.6, reviews: 89,  img: "https://images.unsplash.com/photo-1695048133142-1a20484d2569?w=200&q=80" },
+  { name: "Nike Air Force 1 '07",   price: "GH₵ 850",   rating: 4.7, reviews: 96,  img: "https://images.unsplash.com/photo-1542291026-7eec264c27ff?w=200&q=80" },
+  { name: "Dior Sauvage Parfum",    price: "GH₵ 1,200", rating: 4.9, reviews: 72,  img: "https://images.unsplash.com/photo-1541643600914-78b084683702?w=200&q=80" },
 ];
+
+// ── Countdown hook ────────────────────────────────────────────────────────
+
+function useCountdown(targetHours = 8, targetMins = 45, targetSecs = 32) {
+  const total = useRef(targetHours * 3600 + targetMins * 60 + targetSecs);
+  const [time, setTime] = useState(total.current);
+  useEffect(() => {
+    const id = setInterval(() => setTime(t => Math.max(0, t - 1)), 1000);
+    return () => clearInterval(id);
+  }, []);
+  const h = String(Math.floor(time / 3600)).padStart(2, "0");
+  const m = String(Math.floor((time % 3600) / 60)).padStart(2, "0");
+  const s = String(time % 60).padStart(2, "0");
+  return { h, m, s };
+}
+
+// ── Stars ────────────────────────────────────────────────────────────────
+
+function Stars({ rating }: { rating: number }) {
+  return (
+    <span className="text-yellow-400 text-xs">
+      {"★".repeat(Math.floor(rating))}{"☆".repeat(5 - Math.floor(rating))}
+    </span>
+  );
+}
+
+// ── Main component ───────────────────────────────────────────────────────
 
 export default function Home() {
   const [user, setUser] = useState<any>(null);
-  const [email, setEmail] = useState("");
+  const [wishlist, setWishlist] = useState<Set<number>>(new Set());
+  const { h, m, s } = useCountdown();
 
   useEffect(() => {
     supabase.auth.getUser().then(({ data }) => setUser(data.user));
   }, []);
 
-  const handleSignOut = async () => {
-    await supabase.auth.signOut();
-    setUser(null);
-  };
+  const toggleWish = (i: number) =>
+    setWishlist(prev => {
+      const n = new Set(prev);
+      n.has(i) ? n.delete(i) : n.add(i);
+      return n;
+    });
 
   return (
-    <main className="min-h-screen bg-white font-sans">
+    <main
+      style={{ backgroundColor: "#0d0d0d", color: "#fff", fontFamily: "'Segoe UI', sans-serif", maxWidth: 480, margin: "0 auto", minHeight: "100vh" }}
+    >
 
-      {/* Announcement Bar */}
-      <div className="bg-green-800 text-green-100 text-xs text-center py-1.5 px-4">
-        🇬🇭 MADE IN GHANA &nbsp;·&nbsp; Supporting local, empowering communities.
+      {/* ── Top Bar ── */}
+      <header style={{ backgroundColor: "#111", padding: "14px 16px", display: "flex", alignItems: "center", gap: 10 }}>
+        {/* Hamburger */}
+        <button style={{ background: "none", border: "none", color: "#fff", fontSize: 22, cursor: "pointer", padding: 0 }}>☰</button>
+
+        {/* Logo */}
+        <div style={{ marginRight: 8 }}>
+          <span style={{ fontWeight: 900, fontSize: 18, color: "#fff" }}>Ghana</span>
+          <span style={{ fontWeight: 900, fontSize: 18, color: "#f5a623" }}>Market</span>
+          <div style={{ fontSize: 10, color: "#888", marginTop: -2 }}>Buy. Sell. Connect.</div>
+        </div>
+
+        {/* Search */}
+        <div style={{ flex: 1, background: "#1e1e1e", borderRadius: 24, display: "flex", alignItems: "center", padding: "8px 12px", gap: 6 }}>
+          <span style={{ color: "#888", fontSize: 14 }}>🔍</span>
+          <span style={{ color: "#555", fontSize: 13 }}>Search for products...</span>
+        </div>
+
+        {/* Bell */}
+        <div style={{ position: "relative", marginLeft: 6 }}>
+          <span style={{ fontSize: 20 }}>🔔</span>
+          <span style={{ position: "absolute", top: -4, right: -4, background: "#f5a623", color: "#000", fontSize: 9, fontWeight: 900, borderRadius: "50%", width: 16, height: 16, display: "flex", alignItems: "center", justifyContent: "center" }}>3</span>
+        </div>
+
+        {/* Cart */}
+        <span style={{ fontSize: 20, marginLeft: 6 }}>🛒</span>
+      </header>
+
+      {/* ── Delivery + Wallet ── */}
+      <div style={{ background: "#111", padding: "8px 16px", display: "flex", alignItems: "center", justifyContent: "space-between", borderTop: "1px solid #1a1a1a" }}>
+        <div style={{ display: "flex", alignItems: "center", gap: 6, fontSize: 13, color: "#ccc" }}>
+          <span>📍</span>
+          <span>Deliver to: <strong style={{ color: "#fff" }}>Accra, Ghana</strong> ▾</span>
+        </div>
+        <button style={{ background: "#1a1a1a", border: "1px solid #333", borderRadius: 8, padding: "6px 14px", color: "#f5a623", fontSize: 12, fontWeight: 700, display: "flex", alignItems: "center", gap: 5, cursor: "pointer" }}>
+          💰 Wallet
+        </button>
       </div>
 
-      {/* Navbar */}
-      <nav className="sticky top-0 z-50 bg-white shadow-sm px-4 py-3 flex justify-between items-center">
-        <div className="flex items-center gap-1.5">
-          <span className="text-xl">🛍️</span>
-          <h1 className="text-xl font-black text-green-800">
-            Ghana<span className="text-yellow-500">Market</span>
-          </h1>
+      {/* ── Hero Banner ── */}
+      <section style={{ position: "relative", height: 260, overflow: "hidden" }}>
+        {/* Background image — use the AI-generated Ghana arch image */}
+        <div style={{
+          position: "absolute", inset: 0,
+          backgroundImage: `url('/hero-bg.jpg')`,
+          backgroundSize: "cover",
+          backgroundPosition: "center top",
+          filter: "brightness(0.75)",
+        }} />
+        {/* Gradient overlay */}
+        <div style={{ position: "absolute", inset: 0, background: "linear-gradient(to right, rgba(0,0,0,0.75) 45%, transparent)" }} />
+
+        {/* Text content */}
+        <div style={{ position: "relative", zIndex: 2, padding: "32px 20px" }}>
+          <h2 style={{ margin: 0, fontSize: 28, fontWeight: 900, lineHeight: 1.2, color: "#fff" }}>
+            Ghana's<br />
+            <span style={{ color: "#f5a623" }}>Trusted<br />Marketplace</span>
+          </h2>
+          <p style={{ color: "#ccc", fontSize: 13, margin: "8px 0 16px" }}>Everything you need,<br />from trusted sellers.</p>
+          <a
+            href="/products"
+            style={{ display: "inline-flex", alignItems: "center", gap: 8, background: "#f5a623", color: "#000", fontWeight: 800, fontSize: 14, padding: "10px 22px", borderRadius: 24, textDecoration: "none" }}
+          >
+            Shop Now →
+          </a>
         </div>
-        <div className="hidden md:flex gap-6 text-sm font-semibold text-gray-600">
-          <a href="/" className="text-green-700 border-b-2 border-green-700 pb-0.5">Home</a>
-          <a href="/products" className="hover:text-green-700">Products</a>
-          <a href="#" className="hover:text-green-700">About</a>
-          <a href="#" className="hover:text-green-700">Contact</a>
+
+        {/* Dots */}
+        <div style={{ position: "absolute", bottom: 12, left: "50%", transform: "translateX(-50%)", display: "flex", gap: 5, zIndex: 2 }}>
+          {[0,1,2,3].map(i => (
+            <div key={i} style={{ width: i === 0 ? 20 : 6, height: 6, borderRadius: 3, background: i === 0 ? "#f5a623" : "#555" }} />
+          ))}
         </div>
-        <div className="flex items-center gap-2">
-          <a href="/products" className="text-gray-500 text-lg md:hidden">🔍</a>
-          {user ? (
-            <button onClick={handleSignOut} className="bg-red-500 text-white px-3 py-1.5 rounded-full text-xs font-bold hover:bg-red-600">
-              Sign Out
-            </button>
-          ) : (
-            <a href="/auth" className="bg-green-700 text-white px-3 py-1.5 rounded-full text-xs font-bold hover:bg-green-600">
-              👤 Sign In
+      </section>
+
+      {/* ── Features ── */}
+      <section style={{ background: "#111", padding: "16px 10px" }}>
+        <div style={{ display: "flex", justifyContent: "space-between" }}>
+          {features.map(f => (
+            <div key={f.label} style={{ textAlign: "center", flex: 1 }}>
+              <div style={{ background: "#1a1a1a", borderRadius: 12, width: 48, height: 48, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 22, margin: "0 auto 6px" }}>{f.icon}</div>
+              <p style={{ fontSize: 10, color: "#ccc", margin: 0, lineHeight: 1.3, whiteSpace: "pre-line" }}>{f.label}</p>
+            </div>
+          ))}
+        </div>
+      </section>
+
+      {/* ── Shop by Category ── */}
+      <section style={{ padding: "16px 16px 8px" }}>
+        <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 12 }}>
+          <h3 style={{ margin: 0, fontSize: 16, fontWeight: 800 }}>Shop by Category</h3>
+          <a href="/products" style={{ color: "#f5a623", fontSize: 13, fontWeight: 600, textDecoration: "none" }}>View all →</a>
+        </div>
+        <div style={{ display: "grid", gridTemplateColumns: "repeat(6, 1fr)", gap: 8 }}>
+          {categories.map(cat => (
+            <a key={cat.label} href={`/products?category=${cat.label.toLowerCase()}`} style={{ textDecoration: "none", textAlign: "center" }}>
+              <div style={{ background: "#1a1a1a", borderRadius: 12, overflow: "hidden", height: 64, marginBottom: 5 }}>
+                <img src={cat.img} alt={cat.label} style={{ width: "100%", height: "100%", objectFit: "cover" }} />
+              </div>
+              <p style={{ fontSize: 10, color: "#ccc", margin: 0 }}>{cat.label}</p>
             </a>
-          )}
+          ))}
+          {/* More */}
+          <div style={{ textAlign: "center" }}>
+            <div style={{ background: "#1a1a1a", borderRadius: 12, height: 64, display: "flex", alignItems: "center", justifyContent: "center", marginBottom: 5 }}>
+              <span style={{ fontSize: 22 }}>⊞</span>
+            </div>
+            <p style={{ fontSize: 10, color: "#ccc", margin: 0 }}>More</p>
+          </div>
         </div>
-      </nav>
+      </section>
 
-      {/* Hero — compact on mobile */}
-      <section className="bg-gradient-to-br from-green-50 to-yellow-50 px-4 pt-6 pb-4">
-        <div className="max-w-6xl mx-auto md:grid md:grid-cols-2 md:gap-10 md:items-center">
-          <div>
-            <span className="inline-flex items-center gap-1 bg-green-100 text-green-800 text-xs font-bold px-3 py-1 rounded-full mb-3">
-              🇬🇭 MADE IN GHANA
-            </span>
-            <h2 className="text-3xl md:text-5xl font-black text-gray-900 leading-tight mb-2">
-              Shop Authentic<br />
-              <span className="text-green-800">Ghanaian</span>{" "}
-              <span className="text-yellow-500">Products</span>
-            </h2>
-            <p className="text-gray-500 text-sm mb-4 max-w-sm">
-              Discover the finest kente, food, crafts and more — delivered straight to your door.
-            </p>
+      {/* ── Deals of the Day ── */}
+      <section style={{ margin: "12px 16px", background: "#0f2818", borderRadius: 16, padding: 16, border: "1px solid #1a3a20" }}>
+        <div style={{ display: "flex", alignItems: "flex-start", justifyContent: "space-between" }}>
+          {/* Left */}
+          <div style={{ flex: 1 }}>
+            <div style={{ display: "flex", alignItems: "center", gap: 6, marginBottom: 4 }}>
+              <span style={{ fontSize: 18 }}>⚡</span>
+              <span style={{ fontWeight: 800, fontSize: 15 }}>Deals of the Day</span>
+            </div>
+            <p style={{ color: "#aaa", fontSize: 12, margin: "0 0 14px" }}>Limited time offers. Don't miss out!</p>
+            <a href="/products?deals=true" style={{ display: "inline-flex", alignItems: "center", gap: 6, background: "#f5a623", color: "#000", fontWeight: 800, fontSize: 13, padding: "8px 18px", borderRadius: 24, textDecoration: "none" }}>
+              See All Deals →
+            </a>
+          </div>
 
-            {/* Buttons — side by side on mobile */}
-            <div className="flex gap-3 mb-4">
-              <a href="/products" className="flex-1 text-center bg-green-800 text-white font-bold px-4 py-3 rounded-full text-sm hover:bg-green-700 shadow-md transition-all">
-                🛍️ Shop Now
-              </a>
-              <a href="#" className="flex-1 text-center border-2 border-green-800 text-green-800 font-bold px-4 py-3 rounded-full text-sm hover:bg-green-800 hover:text-white transition-all">
-                🌿 Learn More
-              </a>
+          {/* Right — product + countdown */}
+          <div style={{ textAlign: "center", minWidth: 140 }}>
+            {/* Discount badge + image */}
+            <div style={{ position: "relative", display: "inline-block", marginBottom: 8 }}>
+              <span style={{ position: "absolute", top: 0, left: 0, background: "#f5a623", color: "#000", fontSize: 10, fontWeight: 800, padding: "2px 7px", borderRadius: 6 }}>-28%</span>
+              <div style={{ background: "#1a1a1a", borderRadius: 12, border: "1px dashed #333", padding: "10px 14px" }}>
+                <img src="https://images.unsplash.com/photo-1600294037681-c80b4cb5b434?w=100&q=80" alt="AirPods" style={{ width: 70, height: 70, objectFit: "contain" }} />
+              </div>
             </div>
 
-            {/* Trust badges — horizontal scroll on mobile */}
-            <div className="flex gap-2 overflow-x-auto pb-1 scrollbar-hide">
-              {["✅ Authentic", "🚚 Fast Delivery", "🤝 Local Support"].map((b) => (
-                <span key={b} className="whitespace-nowrap bg-white border border-gray-200 text-gray-600 text-xs px-3 py-1.5 rounded-full shadow-sm font-medium flex-shrink-0">
-                  {b}
-                </span>
+            {/* Countdown */}
+            <div style={{ display: "flex", gap: 4, justifyContent: "center", marginBottom: 6 }}>
+              {[{ v: h, l: "HRS" }, { v: m, l: "MINS" }, { v: s, l: "SECS" }].map(({ v, l }) => (
+                <div key={l} style={{ textAlign: "center" }}>
+                  <div style={{ background: "#111", borderRadius: 6, padding: "4px 6px", fontWeight: 900, fontSize: 14, minWidth: 30 }}>{v}</div>
+                  <div style={{ fontSize: 8, color: "#666", marginTop: 2 }}>{l}</div>
+                </div>
               ))}
             </div>
-          </div>
 
-          {/* Hero visual — hidden on small mobile, shown on md+ */}
-          <div className="hidden md:flex bg-gradient-to-br from-green-800 to-green-600 rounded-3xl p-8 items-center justify-center min-h-[280px] shadow-xl relative overflow-hidden">
-            <div className="absolute top-0 right-0 w-40 h-40 bg-yellow-400/20 rounded-full -translate-y-12 translate-x-12" />
-            <div className="text-center text-white relative z-10">
-              <div className="text-7xl mb-3">🧺</div>
-              <div className="flex gap-5 justify-center text-4xl mb-3"><span>🧥</span><span>🍯</span><span>🏺</span></div>
-              <p className="text-green-200 text-xs font-semibold tracking-wide">Authentic Ghanaian Goods</p>
-            </div>
+            <p style={{ margin: "0 0 2px", fontWeight: 700, fontSize: 12 }}>Apple AirPods Pro<br />(2nd Generation)</p>
+            <p style={{ color: "#f5a623", fontWeight: 900, fontSize: 14, margin: "4px 0 2px" }}>GH₵ 1,299</p>
+            <p style={{ color: "#555", fontSize: 11, margin: 0, textDecoration: "line-through" }}>GH₵ 1,799</p>
           </div>
         </div>
       </section>
 
-      {/* Categories — compact */}
-      <section className="py-5 px-4 bg-white">
-        <h3 className="text-base font-black text-gray-800 mb-3 flex items-center gap-1">🛒 Shop by Category</h3>
-        <div className="grid grid-cols-4 gap-2">
-          {categories.map((cat) => (
-            <a
-              href={cat.href}
-              key={cat.label}
-              className="bg-gray-50 border border-gray-100 rounded-xl p-3 text-center hover:shadow-md hover:-translate-y-0.5 transition-all group"
-            >
-              <p className="text-2xl mb-1">{cat.emoji}</p>
-              <p className="font-bold text-gray-700 text-xs">{cat.label}</p>
-              <p className="text-green-600 text-xs mt-0.5 group-hover:underline hidden md:block">Explore →</p>
-            </a>
-          ))}
+      {/* ── Featured Products ── */}
+      <section style={{ padding: "8px 16px 20px" }}>
+        <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 12 }}>
+          <h3 style={{ margin: 0, fontSize: 16, fontWeight: 800 }}>Featured Products</h3>
+          <a href="/products" style={{ color: "#f5a623", fontSize: 13, fontWeight: 600, textDecoration: "none" }}>View all →</a>
         </div>
-      </section>
-
-      {/* Features strip */}
-      <section className="bg-green-800 py-4 px-4">
-        <div className="grid grid-cols-4 gap-2 max-w-5xl mx-auto">
-          {features.map((f) => (
-            <div key={f.title} className="text-center text-white">
-              <div className="text-xl mb-0.5">{f.icon}</div>
-              <p className="font-bold text-xs leading-tight">{f.title}</p>
-            </div>
-          ))}
-        </div>
-      </section>
-
-      {/* Popular Picks — horizontal scroll on mobile */}
-      <section className="py-5 px-4 bg-white">
-        <div className="flex justify-between items-center mb-3">
-          <h3 className="text-base font-black text-gray-800">🔥 Popular Picks</h3>
-          <a href="/products" className="text-green-600 text-xs font-semibold">View all →</a>
-        </div>
-        <div className="flex gap-3 overflow-x-auto pb-2 scrollbar-hide md:grid md:grid-cols-4">
-          {popularPicks.map((item) => (
-            <div
-              key={item.name}
-              className="flex-shrink-0 w-36 md:w-auto bg-white border border-gray-100 rounded-xl overflow-hidden shadow-sm hover:shadow-md transition-all"
-            >
-              <div className="relative bg-gray-50 p-4 text-center">
-                <button className="absolute top-2 right-2 text-gray-300 hover:text-red-400 text-sm">♡</button>
-                <span className="text-4xl">{item.emoji}</span>
-                <span className={`absolute bottom-2 left-2 ${item.color} text-white text-xs px-1.5 py-0.5 rounded-full font-semibold`}>
-                  {item.category}
-                </span>
+        <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 12 }}>
+          {featuredProducts.map((p, i) => (
+            <div key={p.name} style={{ background: "#111", borderRadius: 14, overflow: "hidden", border: "1px solid #1e1e1e" }}>
+              <div style={{ position: "relative", background: "#1a1a1a", height: 140 }}>
+                <img src={p.img} alt={p.name} style={{ width: "100%", height: "100%", objectFit: "cover" }} />
+                <button
+                  onClick={() => toggleWish(i)}
+                  style={{ position: "absolute", top: 8, right: 8, background: "rgba(0,0,0,0.5)", border: "none", borderRadius: "50%", width: 28, height: 28, fontSize: 14, cursor: "pointer", color: wishlist.has(i) ? "#e74c3c" : "#aaa" }}
+                >
+                  {wishlist.has(i) ? "♥" : "♡"}
+                </button>
               </div>
-              <div className="p-2">
-                <p className="font-semibold text-gray-800 text-xs leading-tight mb-0.5">{item.name}</p>
-                <p className="text-green-700 font-black text-sm">{item.price}</p>
-                <div className="flex items-center gap-0.5 mt-0.5">
-                  <span className="text-yellow-400 text-xs">{"★".repeat(item.rating)}</span>
-                  <span className="text-gray-400 text-xs">({item.reviews})</span>
+              <div style={{ padding: "10px 10px 12px" }}>
+                <p style={{ margin: "0 0 4px", fontSize: 12, fontWeight: 600, color: "#eee", lineHeight: 1.3 }}>{p.name}</p>
+                <p style={{ margin: "0 0 5px", fontSize: 14, fontWeight: 900, color: "#f5a623" }}>{p.price}</p>
+                <div style={{ display: "flex", alignItems: "center", gap: 4 }}>
+                  <Stars rating={p.rating} />
+                  <span style={{ fontSize: 11, color: "#666" }}>({p.reviews})</span>
                 </div>
               </div>
             </div>
@@ -182,46 +260,32 @@ export default function Home() {
         </div>
       </section>
 
-      {/* Newsletter — compact */}
-      <section className="bg-green-50 py-5 px-4">
-        <div className="max-w-lg mx-auto bg-white rounded-2xl shadow-sm p-4 border border-gray-100 flex flex-col sm:flex-row items-center gap-3">
-          <div className="text-3xl bg-green-100 rounded-xl p-3">✉️</div>
-          <div className="flex-1 text-center sm:text-left">
-            <p className="font-black text-gray-800 text-sm mb-0.5">Stay Updated</p>
-            <p className="text-gray-400 text-xs">Get latest deals and new arrivals.</p>
-          </div>
-          <div className="flex gap-2 w-full sm:w-auto">
-            <input
-              type="email"
-              placeholder="Your email"
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-              className="border border-gray-200 rounded-full px-3 py-2 text-xs flex-1 focus:outline-none focus:border-green-500"
-            />
-            <button className="bg-green-700 text-white px-4 py-2 rounded-full text-xs font-bold hover:bg-green-600 whitespace-nowrap">
-              Subscribe
-            </button>
-          </div>
-        </div>
-      </section>
-
-      {/* Footer */}
-      <footer className="bg-green-900 text-green-300 py-5 px-4">
-        <div className="max-w-6xl mx-auto flex flex-col md:flex-row justify-between items-center gap-3">
-          <h1 className="text-lg font-black text-white">Ghana<span className="text-yellow-400">Market</span></h1>
-          <div className="flex gap-4 text-xs flex-wrap justify-center">
-            <a href="#" className="hover:text-white">Privacy Policy</a>
-            <a href="#" className="hover:text-white">Terms of Service</a>
-            <a href="#" className="hover:text-white">FAQs</a>
-          </div>
-          <div className="flex gap-1.5">
-            <span className="bg-white text-gray-800 px-2 py-0.5 rounded text-xs font-bold">VISA</span>
-            <span className="bg-white text-gray-800 px-2 py-0.5 rounded text-xs font-bold">MCard</span>
-            <span className="bg-white text-gray-800 px-2 py-0.5 rounded text-xs font-bold">MoMo</span>
-          </div>
-        </div>
-        <p className="text-center text-xs opacity-50 mt-3">© 2026 GhanaMarket. All rights reserved.</p>
-      </footer>
+      {/* ── Bottom Nav ── */}
+      <nav style={{ position: "sticky", bottom: 0, background: "#111", borderTop: "1px solid #1e1e1e", display: "flex", justifyContent: "space-around", padding: "10px 0 14px" }}>
+        {[
+          { icon: "🏠", label: "Home", active: true },
+          { icon: "⊞", label: "Categories", active: false },
+          { icon: null, label: "Sell", active: false, isCta: true },
+          { icon: "💬", label: "Messages", active: false },
+          { icon: "👤", label: "Profile", active: false },
+        ].map(item => (
+          <button
+            key={item.label}
+            style={{ background: "none", border: "none", cursor: "pointer", display: "flex", flexDirection: "column", alignItems: "center", gap: 3, position: "relative" }}
+          >
+            {item.isCta ? (
+              <div style={{ background: "#f5a623", borderRadius: "50%", width: 46, height: 46, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 22, marginTop: -18, boxShadow: "0 0 0 4px #0d0d0d" }}>
+                ＋
+              </div>
+            ) : (
+              <span style={{ fontSize: 20 }}>{item.icon}</span>
+            )}
+            <span style={{ fontSize: 10, color: item.active ? "#f5a623" : "#555", fontWeight: item.active ? 700 : 400 }}>
+              {item.label}
+            </span>
+          </button>
+        ))}
+      </nav>
 
     </main>
   );
