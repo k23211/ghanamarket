@@ -173,7 +173,13 @@ export default function ProductDetailPage() {
               ✅ Verified Seller
             </p>
           </div>
-          <span style={{ fontSize: 10, color: "#f5a623", fontWeight: 700 }}>View Profile →</span>
+          {/* FIX: View Profile is now a real <a> link instead of a <span> */}
+          <a
+            href={`/profile/${product.seller_id}`}
+            style={{ fontSize: 10, color: "#f5a623", fontWeight: 700, textDecoration: "none" }}
+          >
+            View Profile →
+          </a>
         </div>
       </section>
 
@@ -211,10 +217,9 @@ export default function ProductDetailPage() {
             📞 Call Seller
           </a>
         )}
+        {/* FIX: Replaced WhatsApp wa.me link with in-app chat route */}
         <a
-          href={`https://wa.me/${seller?.phone?.replace(/\D/g, "") || ""}?text=Hi, I'm interested in your product: ${product.name} (GH₵ ${product.price})`}
-          target="_blank"
-          rel="noreferrer"
+          href={`/chat/${product.seller_id}?product=${product.id}`}
           style={{
             flex: 2,
             background: "#f5a623",

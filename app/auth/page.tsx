@@ -29,14 +29,30 @@ export default function AuthPage() {
     setError("");
     if (!fullName.trim()) { setError("Please enter your full name."); setLoading(false); return; }
     if (password.length < 6) { setError("Password must be at least 6 characters."); setLoading(false); return; }
-    const { error } = await supabase.auth.signUp({
+
+    const { data, error } = await supabase.auth.signUp({
       email,
       password,
       options: { data: { full_name: fullName } },
     });
+
     if (error) {
       setError(error.message);
-    } else {
+    } else if (data.user) {
+      // FIX: Insert full_name into the profiles table right after signup
+      const { error: profileError } = await supabase
+        .from("profiles")
+        .insert({
+          id: data.user.id,
+          full_name: fullName,
+          email: email,
+        });
+
+      if (profileError) {
+        // Profile insert failed — log it but don't block the user
+        console.error("Profile insert error:", profileError.message);
+      }
+
       setSuccess("Account created! Check your email to confirm, then sign in.");
       setTab("signin");
     }
