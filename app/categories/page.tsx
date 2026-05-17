@@ -1,6 +1,7 @@
 "use client";
 import { useState, useEffect } from "react";
 import { supabase } from "@/lib/supabase";
+import BottomNav from "@/app/components/BottomNav";
 
 // ── Category data ────────────────────────────────────────────────────────
 const CATEGORIES = [
@@ -25,31 +26,6 @@ function Stars({ n = 5 }: { n?: number }) {
   );
 }
 
-// ── Bottom Nav ───────────────────────────────────────────────────────────
-function BottomNav({ active }: { active: string }) {
-  const items = [
-    { icon: "🏠", label: "Home",       href: "/" },
-    { icon: "⊞", label: "Categories", href: "/categories" },
-    { icon: null, label: "Sell",       href: "/seller/dashboard", isCta: true },
-    { icon: "💬", label: "Messages",   href: "#" },
-    { icon: "👤", label: "Profile",    href: "#" },
-  ];
-  return (
-    <nav style={{ position: "sticky", bottom: 0, background: "#111", borderTop: "1px solid #1e1e1e", display: "flex", justifyContent: "space-around", padding: "10px 0 14px", zIndex: 50 }}>
-      {items.map(item => (
-        <a key={item.label} href={item.href} style={{ textDecoration: "none", display: "flex", flexDirection: "column", alignItems: "center", gap: 3 }}>
-          {item.isCta ? (
-            <div style={{ background: "#f5a623", borderRadius: "50%", width: 46, height: 46, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 22, marginTop: -18, boxShadow: "0 0 0 4px #0d0d0d", color: "#000" }}>＋</div>
-          ) : (
-            <span style={{ fontSize: 20 }}>{item.icon}</span>
-          )}
-          <span style={{ fontSize: 10, color: active === item.label ? "#f5a623" : "#555", fontWeight: active === item.label ? 700 : 400 }}>{item.label}</span>
-        </a>
-      ))}
-    </nav>
-  );
-}
-
 // ── Main ─────────────────────────────────────────────────────────────────
 export default function CategoriesPage() {
   const [products, setProducts]   = useState<any[]>([]);
@@ -60,7 +36,6 @@ export default function CategoriesPage() {
   const [category, setCategory]   = useState("All");
   const [wishlist, setWishlist]   = useState<Set<string>>(new Set());
 
-  // Load data
   useEffect(() => {
     const load = async () => {
       const { data: { user } } = await supabase.auth.getUser();
@@ -73,7 +48,6 @@ export default function CategoriesPage() {
     load();
   }, []);
 
-  // Filter
   useEffect(() => {
     let r = products;
     if (category !== "All") r = r.filter(p => p.category === category);
@@ -93,7 +67,6 @@ export default function CategoriesPage() {
     window.location.href = "/cart";
   };
 
-  // ── Render ──
   return (
     <main style={{ backgroundColor: "#0d0d0d", color: "#fff", fontFamily: "'Segoe UI', sans-serif", maxWidth: 480, margin: "0 auto", minHeight: "100vh" }}>
 
@@ -155,7 +128,6 @@ export default function CategoriesPage() {
                   transition: "all 0.2s",
                 }}
               >
-                {/* Image or icon */}
                 <div style={{ width: 44, height: 44, borderRadius: 10, overflow: "hidden", background: active ? "rgba(0,0,0,0.2)" : "#111", display: "flex", alignItems: "center", justifyContent: "center" }}>
                   {cat.img ? (
                     <img src={cat.img} alt={cat.label} style={{ width: "100%", height: "100%", objectFit: "cover" }} />
@@ -170,7 +142,6 @@ export default function CategoriesPage() {
         </div>
       </section>
 
-      {/* Divider */}
       <div style={{ margin: "8px 16px", borderTop: "1px solid #1e1e1e" }} />
 
       {/* Results header */}
@@ -179,7 +150,6 @@ export default function CategoriesPage() {
           {category === "All" ? "All Products" : category}
           <span style={{ color: "#555", fontWeight: 400, fontSize: 13 }}> ({filtered.length})</span>
         </h3>
-        {/* Sort pill */}
         <button style={{ background: "#1a1a1a", border: "1px solid #2a2a2a", borderRadius: 20, padding: "5px 12px", color: "#aaa", fontSize: 11, cursor: "pointer" }}>
           Sort ▾
         </button>
@@ -202,25 +172,21 @@ export default function CategoriesPage() {
           <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 12 }}>
             {filtered.map(product => (
               <div key={product.id} style={{ background: "#111", borderRadius: 14, overflow: "hidden", border: "1px solid #1e1e1e" }}>
-                {/* Image */}
                 <div style={{ position: "relative", height: 140, background: "#1a1a1a" }}>
                   {product.image_url ? (
                     <img src={product.image_url} alt={product.name} style={{ width: "100%", height: "100%", objectFit: "cover" }} />
                   ) : (
                     <div style={{ width: "100%", height: "100%", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 40 }}>🛍️</div>
                   )}
-                  {/* Category badge */}
                   <span style={{ position: "absolute", top: 8, left: 8, background: "rgba(0,0,0,0.6)", color: "#f5a623", fontSize: 9, fontWeight: 700, padding: "3px 8px", borderRadius: 10 }}>
                     {product.category}
                   </span>
-                  {/* Wishlist */}
                   <button onClick={() => toggleWish(product.id)}
                     style={{ position: "absolute", top: 6, right: 6, background: "rgba(0,0,0,0.5)", border: "none", borderRadius: "50%", width: 28, height: 28, fontSize: 13, cursor: "pointer", color: wishlist.has(product.id) ? "#e74c3c" : "#aaa" }}>
                     {wishlist.has(product.id) ? "♥" : "♡"}
                   </button>
                 </div>
 
-                {/* Info */}
                 <div style={{ padding: "10px 10px 12px" }}>
                   <p style={{ margin: "0 0 3px", fontSize: 12, fontWeight: 600, color: "#eee", lineHeight: 1.3 }}>{product.name}</p>
                   {product.description && (
@@ -246,7 +212,8 @@ export default function CategoriesPage() {
         )}
       </section>
 
-      <BottomNav active="Categories" />
+      <div style={{ paddingBottom: 80 }} />
+      <BottomNav />
     </main>
   );
 }

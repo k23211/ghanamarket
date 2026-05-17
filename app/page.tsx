@@ -1,6 +1,7 @@
 "use client";
 import { useState, useEffect, useRef } from "react";
 import { supabase } from "@/lib/supabase";
+import BottomNav from "@/app/components/BottomNav";
 
 // ── Data ────────────────────────────────────────────────────────────────────
 
@@ -116,7 +117,6 @@ export default function Home() {
 
       {/* ── Hero Banner ── */}
       <section style={{ position: "relative", height: 260, overflow: "hidden" }}>
-        {/* Background image — use the AI-generated Ghana arch image */}
         <div style={{
           position: "absolute", inset: 0,
           backgroundImage: `url('/hero-bg.jpg')`,
@@ -124,10 +124,8 @@ export default function Home() {
           backgroundPosition: "center top",
           filter: "brightness(0.75)",
         }} />
-        {/* Gradient overlay */}
         <div style={{ position: "absolute", inset: 0, background: "linear-gradient(to right, rgba(0,0,0,0.75) 45%, transparent)" }} />
 
-        {/* Text content */}
         <div style={{ position: "relative", zIndex: 2, padding: "32px 20px" }}>
           <h2 style={{ margin: 0, fontSize: 28, fontWeight: 900, lineHeight: 1.2, color: "#fff" }}>
             Ghana's<br />
@@ -142,7 +140,6 @@ export default function Home() {
           </a>
         </div>
 
-        {/* Dots */}
         <div style={{ position: "absolute", bottom: 12, left: "50%", transform: "translateX(-50%)", display: "flex", gap: 5, zIndex: 2 }}>
           {[0,1,2,3].map(i => (
             <div key={i} style={{ width: i === 0 ? 20 : 6, height: 6, borderRadius: 3, background: i === 0 ? "#f5a623" : "#555" }} />
@@ -177,7 +174,6 @@ export default function Home() {
               <p style={{ fontSize: 10, color: "#ccc", margin: 0 }}>{cat.label}</p>
             </a>
           ))}
-          {/* More */}
           <div style={{ textAlign: "center" }}>
             <div style={{ background: "#1a1a1a", borderRadius: 12, height: 64, display: "flex", alignItems: "center", justifyContent: "center", marginBottom: 5 }}>
               <span style={{ fontSize: 22 }}>⊞</span>
@@ -190,7 +186,6 @@ export default function Home() {
       {/* ── Deals of the Day ── */}
       <section style={{ margin: "12px 16px", background: "#0f2818", borderRadius: 16, padding: 16, border: "1px solid #1a3a20" }}>
         <div style={{ display: "flex", alignItems: "flex-start", justifyContent: "space-between" }}>
-          {/* Left */}
           <div style={{ flex: 1 }}>
             <div style={{ display: "flex", alignItems: "center", gap: 6, marginBottom: 4 }}>
               <span style={{ fontSize: 18 }}>⚡</span>
@@ -202,9 +197,7 @@ export default function Home() {
             </a>
           </div>
 
-          {/* Right — product + countdown */}
           <div style={{ textAlign: "center", minWidth: 140 }}>
-            {/* Discount badge + image */}
             <div style={{ position: "relative", display: "inline-block", marginBottom: 8 }}>
               <span style={{ position: "absolute", top: 0, left: 0, background: "#f5a623", color: "#000", fontSize: 10, fontWeight: 800, padding: "2px 7px", borderRadius: 6 }}>-28%</span>
               <div style={{ background: "#1a1a1a", borderRadius: 12, border: "1px dashed #333", padding: "10px 14px" }}>
@@ -212,7 +205,6 @@ export default function Home() {
               </div>
             </div>
 
-            {/* Countdown */}
             <div style={{ display: "flex", gap: 4, justifyContent: "center", marginBottom: 6 }}>
               {[{ v: h, l: "HRS" }, { v: m, l: "MINS" }, { v: s, l: "SECS" }].map(({ v, l }) => (
                 <div key={l} style={{ textAlign: "center" }}>
@@ -260,32 +252,9 @@ export default function Home() {
         </div>
       </section>
 
-      {/* ── Bottom Nav ── */}
-      <nav style={{ position: "sticky", bottom: 0, background: "#111", borderTop: "1px solid #1e1e1e", display: "flex", justifyContent: "space-around", padding: "10px 0 14px" }}>
-        {[
-          { icon: "🏠", label: "Home", active: true },
-          { icon: "⊞", label: "Categories", active: false },
-          { icon: null, label: "Sell", active: false, isCta: true },
-          { icon: "💬", label: "Messages", active: false },
-          { icon: "👤", label: "Profile", active: false },
-        ].map(item => (
-          <button
-            key={item.label}
-            style={{ background: "none", border: "none", cursor: "pointer", display: "flex", flexDirection: "column", alignItems: "center", gap: 3, position: "relative" }}
-          >
-            {item.isCta ? (
-              <div style={{ background: "#f5a623", borderRadius: "50%", width: 46, height: 46, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 22, marginTop: -18, boxShadow: "0 0 0 4px #0d0d0d" }}>
-                ＋
-              </div>
-            ) : (
-              <span style={{ fontSize: 20 }}>{item.icon}</span>
-            )}
-            <span style={{ fontSize: 10, color: item.active ? "#f5a623" : "#555", fontWeight: item.active ? 700 : 400 }}>
-              {item.label}
-            </span>
-          </button>
-        ))}
-      </nav>
+      {/* Padding so content doesn't hide behind BottomNav */}
+      <div style={{ paddingBottom: 80 }} />
+      <BottomNav />
 
     </main>
   );

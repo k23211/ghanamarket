@@ -1,35 +1,12 @@
 "use client";
 import { useState, useEffect } from "react";
 import { supabase } from "@/lib/supabase";
+import BottomNav from "@/app/components/BottomNav";
 
 const CATEGORIES = ["All", "Fashion", "Food", "Jewelry", "Crafts", "Beauty", "Electronics", "Home & Living", "Groceries", "Other"];
 
 function Stars({ n = 5 }: { n?: number }) {
   return <span style={{ color: "#f5a623", fontSize: 11 }}>{"★".repeat(n)}{"☆".repeat(5 - n)}</span>;
-}
-
-function BottomNav({ active }: { active: string }) {
-  const items = [
-    { icon: "🏠", label: "Home",       href: "/" },
-    { icon: "⊞", label: "Categories", href: "/categories" },
-    { icon: null, label: "Sell",       href: "/seller/dashboard", isCta: true },
-    { icon: "💬", label: "Messages",   href: "#" },
-    { icon: "👤", label: "Profile",    href: "#" },
-  ];
-  return (
-    <nav style={{ position: "sticky", bottom: 0, background: "#111", borderTop: "1px solid #1e1e1e", display: "flex", justifyContent: "space-around", padding: "10px 0 14px", zIndex: 50 }}>
-      {items.map(item => (
-        <a key={item.label} href={item.href} style={{ textDecoration: "none", display: "flex", flexDirection: "column", alignItems: "center", gap: 3 }}>
-          {item.isCta ? (
-            <div style={{ background: "#f5a623", borderRadius: "50%", width: 46, height: 46, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 22, marginTop: -18, boxShadow: "0 0 0 4px #0d0d0d", color: "#000" }}>＋</div>
-          ) : (
-            <span style={{ fontSize: 20 }}>{item.icon}</span>
-          )}
-          <span style={{ fontSize: 10, color: active === item.label ? "#f5a623" : "#555", fontWeight: active === item.label ? 700 : 400 }}>{item.label}</span>
-        </a>
-      ))}
-    </nav>
-  );
 }
 
 export default function ProductsPage() {
@@ -52,7 +29,6 @@ export default function ProductsPage() {
     };
     load();
 
-    // Read ?category= from URL
     const params = new URLSearchParams(window.location.search);
     const cat = params.get("category");
     if (cat) setCategory(cat.charAt(0).toUpperCase() + cat.slice(1));
@@ -182,25 +158,21 @@ export default function ProductsPage() {
           <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 12 }}>
             {filtered.map(product => (
               <div key={product.id} style={{ background: "#111", borderRadius: 14, overflow: "hidden", border: "1px solid #1e1e1e" }}>
-                {/* Image */}
                 <div style={{ position: "relative", height: 140, background: "#1a1a1a" }}>
                   {product.image_url ? (
                     <img src={product.image_url} alt={product.name} style={{ width: "100%", height: "100%", objectFit: "cover" }} />
                   ) : (
                     <div style={{ width: "100%", height: "100%", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 40 }}>🛍️</div>
                   )}
-                  {/* Category badge */}
                   <span style={{ position: "absolute", top: 8, left: 8, background: "rgba(0,0,0,0.65)", color: "#f5a623", fontSize: 9, fontWeight: 700, padding: "3px 8px", borderRadius: 10 }}>
                     {product.category}
                   </span>
-                  {/* Wishlist */}
                   <button onClick={() => toggleWish(product.id)}
                     style={{ position: "absolute", top: 6, right: 6, background: "rgba(0,0,0,0.5)", border: "none", borderRadius: "50%", width: 28, height: 28, fontSize: 13, cursor: "pointer", color: wishlist.has(product.id) ? "#e74c3c" : "#aaa" }}>
                     {wishlist.has(product.id) ? "♥" : "♡"}
                   </button>
                 </div>
 
-                {/* Info */}
                 <div style={{ padding: "10px 10px 12px" }}>
                   <p style={{ margin: "0 0 3px", fontSize: 12, fontWeight: 600, color: "#eee", lineHeight: 1.3 }}>{product.name}</p>
                   {product.description && (
@@ -225,7 +197,8 @@ export default function ProductsPage() {
         )}
       </section>
 
-      <BottomNav active="Categories" />
+      <div style={{ paddingBottom: 80 }} />
+      <BottomNav />
     </main>
   );
 }

@@ -1,6 +1,7 @@
 "use client";
 import { useState, useEffect } from "react";
 import { supabase } from "@/lib/supabase";
+import BottomNav from "@/app/components/BottomNav";
 
 export default function CartPage() {
   const [cartItems, setCartItems] = useState<any[]>([]);
@@ -34,49 +35,53 @@ export default function CartPage() {
   }, 0);
 
   if (loading) return (
-    <div className="min-h-screen flex items-center justify-center">
-      <p className="text-green-700 font-bold">Loading...</p>
+    <div style={{ minHeight: "100vh", display: "flex", alignItems: "center", justifyContent: "center", background: "#0d0d0d" }}>
+      <p style={{ color: "#f5a623", fontWeight: 700 }}>Loading...</p>
     </div>
   );
 
   return (
-    <main className="min-h-screen bg-gray-50">
-      <nav className="bg-white shadow-sm px-6 py-4 flex justify-between items-center">
-        <a href="/" className="text-2xl font-black text-green-700">
-          Ghana<span className="text-yellow-500">Market</span>
-        </a>
-        <a href="/products" className="text-sm text-green-700 font-semibold hover:underline">
-          ← Continue Shopping
-        </a>
-      </nav>
+    <main style={{ backgroundColor: "#0d0d0d", color: "#fff", fontFamily: "'Segoe UI', sans-serif", maxWidth: 480, margin: "0 auto", minHeight: "100vh" }}>
 
-      <div className="max-w-2xl mx-auto px-6 py-8">
-        <h2 className="text-3xl font-black text-gray-800 mb-6">My Cart 🛒</h2>
+      {/* Header */}
+      <header style={{ background: "#111", padding: "14px 16px", display: "flex", alignItems: "center", gap: 10, position: "sticky", top: 0, zIndex: 40, borderBottom: "1px solid #1e1e1e" }}>
+        <a href="/" style={{ color: "#fff", fontSize: 20, textDecoration: "none" }}>←</a>
+        <div style={{ flex: 1 }}>
+          <span style={{ fontWeight: 900, fontSize: 17, color: "#fff" }}>Ghana</span>
+          <span style={{ fontWeight: 900, fontSize: 17, color: "#f5a623" }}>Market</span>
+        </div>
+        <a href="/products" style={{ color: "#f5a623", fontSize: 13, fontWeight: 600, textDecoration: "none" }}>
+          Continue Shopping →
+        </a>
+      </header>
+
+      <div style={{ padding: "20px 16px" }}>
+        <h2 style={{ margin: "0 0 20px", fontSize: 22, fontWeight: 900 }}>My Cart 🛒</h2>
 
         {cartItems.length === 0 ? (
-          <div className="bg-white rounded-2xl shadow p-10 text-center">
-            <p className="text-5xl mb-4">🛒</p>
-            <p className="text-gray-500 mb-4">Your cart is empty</p>
-            <a href="/products" className="bg-green-700 text-white px-6 py-3 rounded-xl font-bold hover:bg-green-600">
+          <div style={{ background: "#111", borderRadius: 20, padding: 40, textAlign: "center", border: "1px solid #1e1e1e" }}>
+            <p style={{ fontSize: 48, marginBottom: 12 }}>🛒</p>
+            <p style={{ color: "#555", marginBottom: 16 }}>Your cart is empty</p>
+            <a href="/products" style={{ display: "inline-block", background: "#f5a623", color: "#000", padding: "10px 24px", borderRadius: 24, fontWeight: 800, textDecoration: "none" }}>
               Shop Now
             </a>
           </div>
         ) : (
           <>
-            <div className="space-y-4 mb-6">
+            <div style={{ display: "flex", flexDirection: "column", gap: 12, marginBottom: 20 }}>
               {cartItems.map((item) => (
-                <div key={item.id} className="bg-white rounded-2xl shadow p-4 flex items-center gap-4">
-                  <div className="bg-green-100 rounded-xl w-16 h-16 flex items-center justify-center text-3xl">
+                <div key={item.id} style={{ background: "#111", borderRadius: 16, padding: 14, display: "flex", alignItems: "center", gap: 14, border: "1px solid #1e1e1e" }}>
+                  <div style={{ background: "#1a1a1a", borderRadius: 12, width: 60, height: 60, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 28, flexShrink: 0 }}>
                     🛍️
                   </div>
-                  <div className="flex-1">
-                    <p className="font-bold text-gray-800">{item.products?.name}</p>
-                    <p className="text-green-700 font-black">GH₵ {item.products?.price}</p>
-                    <p className="text-xs text-gray-500">Qty: {item.quantity}</p>
+                  <div style={{ flex: 1 }}>
+                    <p style={{ margin: "0 0 3px", fontWeight: 700, fontSize: 14, color: "#eee" }}>{item.products?.name}</p>
+                    <p style={{ margin: "0 0 3px", color: "#f5a623", fontWeight: 900, fontSize: 15 }}>GH₵ {item.products?.price}</p>
+                    <p style={{ margin: 0, fontSize: 11, color: "#555" }}>Qty: {item.quantity}</p>
                   </div>
                   <button
                     onClick={() => removeItem(item.id)}
-                    className="text-red-500 font-bold text-sm hover:text-red-700"
+                    style={{ background: "rgba(231,76,60,0.15)", border: "none", color: "#e74c3c", fontWeight: 700, fontSize: 12, padding: "6px 12px", borderRadius: 20, cursor: "pointer" }}
                   >
                     Remove
                   </button>
@@ -84,18 +89,21 @@ export default function CartPage() {
               ))}
             </div>
 
-            <div className="bg-white rounded-2xl shadow p-6">
-              <div className="flex justify-between items-center mb-4">
-                <p className="text-gray-600 font-medium">Total</p>
-                <p className="text-2xl font-black text-green-700">GH₵ {total}</p>
+            <div style={{ background: "#111", borderRadius: 20, padding: 20, border: "1px solid #1e1e1e" }}>
+              <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 16 }}>
+                <p style={{ color: "#aaa", fontWeight: 500, margin: 0 }}>Total</p>
+                <p style={{ fontSize: 22, fontWeight: 900, color: "#f5a623", margin: 0 }}>GH₵ {total}</p>
               </div>
-              <a href="/checkout" className="block w-full bg-green-700 text-white font-bold py-3 rounded-xl hover:bg-green-600 text-center">
-                Proceed to Checkout
+              <a href="/checkout" style={{ display: "block", width: "100%", background: "#f5a623", color: "#000", fontWeight: 800, padding: "14px 0", borderRadius: 14, textAlign: "center", textDecoration: "none", fontSize: 15 }}>
+                Proceed to Checkout →
               </a>
             </div>
           </>
         )}
       </div>
+
+      <div style={{ paddingBottom: 80 }} />
+      <BottomNav />
     </main>
   );
 }
