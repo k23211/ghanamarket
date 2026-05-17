@@ -64,7 +64,7 @@ export default function AuthPage() {
         backgroundImage: "url('/hero-bg.png')",
         backgroundSize: "cover",
         backgroundPosition: "center",
-        filter: "brightness(0.25)",
+        filter: "brightness(0.45)",
         zIndex: 0,
       }} />
 
@@ -97,15 +97,16 @@ export default function AuthPage() {
 
         {/* Card */}
         <div style={{
-          background: "rgba(10,10,10,0.75)",
-          backdropFilter: "blur(20px)",
+          background: "rgba(0,0,0,0.35)",
           borderRadius: 24,
-          border: "1px solid #1e1e1e",
+          border: "1px solid rgba(255,255,255,0.08)",
           overflow: "hidden",
+          backdropFilter: "blur(24px)",
+          WebkitBackdropFilter: "blur(24px)",
         }}>
 
           {/* Tabs */}
-          <div style={{ display: "flex", borderBottom: "1px solid #1e1e1e" }}>
+          <div style={{ display: "flex", borderBottom: "1px solid rgba(255,255,255,0.08)" }}>
             {(["signin", "signup"] as const).map(t => (
               <button
                 key={t}
@@ -157,8 +158,8 @@ export default function AuthPage() {
                   onChange={e => setFullName(e.target.value)}
                   style={{
                     width: "100%",
-                    background: "#1a1a1a",
-                    border: "1px solid #2a2a2a",
+                    background: "rgba(255,255,255,0.08)",
+                    border: "1px solid rgba(255,255,255,0.12)",
                     borderRadius: 12,
                     padding: "13px 16px",
                     color: "#fff",
@@ -168,14 +169,14 @@ export default function AuthPage() {
                     transition: "border 0.2s",
                   }}
                   onFocus={e => e.target.style.borderColor = "#f5a623"}
-                  onBlur={e => e.target.style.borderColor = "#2a2a2a"}
+                  onBlur={e => e.target.style.borderColor = "rgba(255,255,255,0.12)"}
                 />
               </div>
             )}
 
             {/* Email */}
             <div style={{ marginBottom: 16 }}>
-              <label style={{ display: "block", fontSize: 12, fontWeight: 600, color: "#888", marginBottom: 8, letterSpacing: 0.5 }}>EMAIL ADDRESS</label>
+              <label style={{ display: "block", fontSize: 12, fontWeight: 600, color: "#aaa", marginBottom: 8, letterSpacing: 0.5 }}>EMAIL ADDRESS</label>
               <input
                 type="email"
                 placeholder="you@example.com"
@@ -183,8 +184,8 @@ export default function AuthPage() {
                 onChange={e => setEmail(e.target.value)}
                 style={{
                   width: "100%",
-                  background: "#1a1a1a",
-                  border: "1px solid #2a2a2a",
+                  background: "rgba(255,255,255,0.08)",
+                  border: "1px solid rgba(255,255,255,0.12)",
                   borderRadius: 12,
                   padding: "13px 16px",
                   color: "#fff",
@@ -193,7 +194,7 @@ export default function AuthPage() {
                   boxSizing: "border-box",
                 }}
                 onFocus={e => e.target.style.borderColor = "#f5a623"}
-                onBlur={e => e.target.style.borderColor = "#2a2a2a"}
+                onBlur={e => e.target.style.borderColor = "rgba(255,255,255,0.12)"}
               />
             </div>
 
@@ -209,8 +210,8 @@ export default function AuthPage() {
                   onKeyDown={e => e.key === "Enter" && (tab === "signin" ? handleSignIn() : handleSignUp())}
                   style={{
                     width: "100%",
-                    background: "#1a1a1a",
-                    border: "1px solid #2a2a2a",
+                    background: "rgba(255,255,255,0.08)",
+                    border: "1px solid rgba(255,255,255,0.12)",
                     borderRadius: 12,
                     padding: "13px 48px 13px 16px",
                     color: "#fff",
@@ -219,7 +220,7 @@ export default function AuthPage() {
                     boxSizing: "border-box",
                   }}
                   onFocus={e => e.target.style.borderColor = "#f5a623"}
-                  onBlur={e => e.target.style.borderColor = "#2a2a2a"}
+                  onBlur={e => e.target.style.borderColor = "rgba(255,255,255,0.12)"}
                 />
                 <button
                   onClick={() => setShowPassword(!showPassword)}
@@ -259,9 +260,9 @@ export default function AuthPage() {
 
             {/* Divider */}
             <div style={{ display: "flex", alignItems: "center", gap: 12, margin: "20px 0" }}>
-              <div style={{ flex: 1, height: 1, background: "#1e1e1e" }} />
-              <span style={{ color: "#444", fontSize: 12 }}>or</span>
-              <div style={{ flex: 1, height: 1, background: "#1e1e1e" }} />
+              <div style={{ flex: 1, height: 1, background: "rgba(255,255,255,0.08)" }} />
+              <span style={{ color: "#888", fontSize: 12 }}>or</span>
+              <div style={{ flex: 1, height: 1, background: "rgba(255,255,255,0.08)" }} />
             </div>
 
             {/* Switch tab */}
