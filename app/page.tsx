@@ -2,6 +2,7 @@
 import { useState, useEffect, useRef } from "react";
 import { supabase } from "@/lib/supabase";
 import BottomNav from "@/app/components/BottomNav";
+import VisitorCount from "@/app/components/VisitorCount";
 
 // ── Stars ─────────────────────────────────────────────────────────────────
 function Stars({ n = 5 }: { n?: number }) {
@@ -137,6 +138,21 @@ export default function HomePage() {
               <p style={{ fontSize: 9, color: "#666", margin: 0 }}>{f.label}</p>
             </div>
           ))}
+        </div>
+      </section>
+
+      <section style={{ padding: "20px 16px", marginTop: 14 }}>
+        <div style={{ display: 'flex', flexDirection: 'column', gap: 14, background: '#111', border: '1px solid #1a1a1a', borderRadius: 18, padding: 18 }}>
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', gap: 12, flexWrap: 'wrap' }}>
+            <div>
+              <p style={{ margin: 0, fontSize: 14, fontWeight: 700, color: '#f5a623' }}>Visitor Count</p>
+              <p style={{ margin: '6px 0 0', fontSize: 12, color: '#aaa' }}>Track how many people have visited GhanaMarket.</p>
+            </div>
+            <div style={{ color: '#888', fontSize: 11 }}>Updated every visit</div>
+          </div>
+          <div style={{ display: 'flex', justifyContent: 'center', padding: 14, background: '#0d0d0d', borderRadius: 16 }}>
+            <VisitorCount />
+          </div>
         </div>
       </section>
 
