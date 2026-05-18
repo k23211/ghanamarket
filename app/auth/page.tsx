@@ -39,18 +39,19 @@ export default function AuthPage() {
     if (error) {
       setError(error.message);
     } else if (data.user) {
-      // FIX: Insert full_name into the profiles table right after signup
       const { error: profileError } = await supabase
         .from("profiles")
-        .insert({
-          id: data.user.id,
-          full_name: fullName,
-          email: email,
-        });
+        .upsert(
+          {
+            id: data.user.id,
+            full_name: fullName,
+            email,
+          },
+          { onConflict: 'id' }
+        );
 
       if (profileError) {
-        // Profile insert failed — log it but don't block the user
-        console.error("Profile insert error:", profileError.message);
+        console.error("Profile insert/update error:", profileError.message);
       }
 
       setSuccess("Account created! Check your email to confirm, then sign in.");
