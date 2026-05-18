@@ -108,16 +108,28 @@ export default function AccountPage() {
       return;
     }
 
-    // Use upsert to ensure the profile row is created/updated reliably
-    const upsertPayload = { id: user.id, ...form };
-    const { error } = await supabase.from('profiles').upsert(upsertPayload, { onConflict: 'id' });
+    const payload = {
+      full_name: form.full_name,
+      phone: form.phone,
+      location: form.location,
+    };
+
+    let error;
+    if (profile?.id) {
+      const { error: updateError } = await supabase.from('profiles').update(payload).eq('id', user.id);
+      error = updateError;
+    } else {
+      const { error: insertError } = await supabase.from('profiles').insert({ id: user.id, email: user.email, ...payload });
+      error = insertError;
+    }
+
     if (error) {
       console.error('Save error:', error.message);
       setErrorMessage(error.message || 'Unable to save profile.');
       return;
     }
 
-    setProfile(prev => prev ? { ...prev, ...form } : ({ id: user.id, full_name: form.full_name, email: user.email, phone: form.phone, location: form.location, avatar_url: null, created_at: new Date().toISOString() } as Profile));
+    setProfile(prev => prev ? { ...prev, ...payload } : ({ id: user.id, full_name: form.full_name, email: user.email, phone: form.phone, location: form.location, avatar_url: null, created_at: new Date().toISOString() } as Profile));
     setEditing(false);
     setStatusMessage('Profile saved successfully.');
   };
@@ -165,10 +177,15 @@ export default function AccountPage() {
       return;
     }
 
-    // Persist avatar URL using upsert to guarantee row exists
-    const { error: updateError } = await supabase
-      .from('profiles')
-      .upsert({ id: user.id, avatar_url: publicUrl }, { onConflict: 'id' });
+    // Persist avatar URL using update when the profile exists
+    let updateError;
+    if (profile?.id) {
+      const result = await supabase.from('profiles').update({ avatar_url: publicUrl }).eq('id', user.id);
+      updateError = result.error;
+    } else {
+      const result = await supabase.from('profiles').insert({ id: user.id, email: user.email, avatar_url: publicUrl });
+      updateError = result.error;
+    }
 
     if (updateError) {
       console.error('Avatar save error:', updateError.message, updateError);
