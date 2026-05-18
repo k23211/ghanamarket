@@ -4,6 +4,7 @@ import { useEffect, useRef, useState, ChangeEvent } from 'react';
 import { useRouter } from 'next/navigation';
 import { supabase } from '../../lib/supabase';
 import BottomNav from '../components/BottomNav';
+import VisitorCount from '../components/VisitorCount';
 
 interface Profile {
   id: string;
@@ -264,6 +265,9 @@ export default function AccountPage() {
         <div style={styles.statBox}>
           <span style={styles.statNum}>{soldCount}</span>
           <span style={styles.statLabel}>Sold</span>
+        </div>
+        <div style={styles.statBox}>
+          <VisitorCount />
         </div>
       </div>
 
