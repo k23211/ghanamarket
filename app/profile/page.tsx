@@ -1,305 +1,198 @@
-"use client";
-import { useState, useEffect, useRef } from "react";
-import { supabase } from "@/lib/supabase";
-import BottomNav from "@/app/components/BottomNav";
+'use client';
+
+import { useEffect, useState } from 'react';
+import { createClientComponentClient } from '@supabase/auth-helpers-nextjs';
+import { useRouter } from 'next/navigation';
+import BottomNav from '../components/BottomNav';
+
+interface Profile {
+  id: string;
+  full_name: string | null;
+  email: string | null;
+  phone: string | null;
+  location: string | null;
+  avatar_url: string | null;
+  created_at: string;
+}
+
+interface Product {
+  id: string;
+  title: string;
+  price: number;
+  image_url: string;
+  status: string;
+}
 
 export default function ProfilePage() {
-  const [user, setUser] = useState<any>(null);
-  const [profile, setProfile] = useState<any>(null);
-  const [myProducts, setMyProducts] = useState<any[]>([]);
-  const [loading, setLoading] = useState(true);
+  const supabase = createClientComponentClient();
+  const router = useRouter();
+  const [profile, setProfile] = useState<Profile | null>(null);
+  const [products, setProducts] = useState<Product[]>([]);
   const [editing, setEditing] = useState(false);
-  const [saving, setSaving] = useState(false);
-  const [avatarUrl, setAvatarUrl] = useState<string | null>(null);
-  const [uploadingAvatar, setUploadingAvatar] = useState(false);
-  const [form, setForm] = useState({ full_name: "", phone: "", location: "" });
-
-  const galleryInputRef = useRef<HTMLInputElement>(null);
-  const cameraInputRef = useRef<HTMLInputElement>(null);
+  const [form, setForm] = useState({ full_name: '', phone: '', location: '' });
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    const init = async () => {
+    const load = async () => {
       const { data: { user } } = await supabase.auth.getUser();
-      if (!user) { window.location.href = "/auth"; return; }
-      setUser(user);
+      if (!user) { router.push('/auth'); return; }
 
       const { data: prof } = await supabase
-        .from("profiles")
-        .select("*")
-        .eq("id", user.id)
+        .from('profiles')
+        .select('*')
+        .eq('id', user.id)
         .single();
 
-      // Merge auth metadata as fallback for missing profile fields
-      const meta = user.user_metadata || {};
-      const merged = {
-        full_name: prof?.full_name || meta.full_name || meta.name || "",
-        phone: prof?.phone || meta.phone || "",
-        location: prof?.location || meta.location || "",
-      };
-
-      setProfile({ ...prof, ...merged });
-      setAvatarUrl(prof?.avatar_url || null);
-      setForm(merged);
+      if (prof) {
+        setProfile(prof);
+        setForm({
+          full_name: prof.full_name || '',
+          phone: prof.phone || '',
+          location: prof.location || '',
+        });
+      }
 
       const { data: prods } = await supabase
-        .from("products")
-        .select("*")
-        .eq("seller_id", user.id)
-        .order("created_at", { ascending: false });
-      setMyProducts(prods || []);
+        .from('products')
+        .select('id, title, price, image_url, status')
+        .eq('seller_id', user.id)
+        .order('created_at', { ascending: false });
+
+      setProducts(prods || []);
       setLoading(false);
     };
-    init();
+    load();
   }, []);
 
-  const saveProfile = async () => {
-    setSaving(true);
-    await supabase.from("profiles").upsert({
-      id: user.id,
-      full_name: form.full_name,
-      phone: form.phone,
-      location: form.location,
-      updated_at: new Date().toISOString(),
-    });
-    setProfile((prev: any) => ({ ...prev, ...form }));
+  const handleSave = async () => {
+    const { data: { user } } = await supabase.auth.getUser();
+    if (!user) return;
+    await supabase.from('profiles').update(form).eq('id', user.id);
+    setProfile(prev => prev ? { ...prev, ...form } : prev);
     setEditing(false);
-    setSaving(false);
-  };
-
-  const handleAvatarUpload = async (file: File) => {
-    if (!file || !user) return;
-    setUploadingAvatar(true);
-    try {
-      const ext = file.name.split(".").pop();
-      const filePath = `avatars/${user.id}.${ext}`;
-
-      const { error: uploadError } = await supabase.storage
-        .from("avatars")
-        .upload(filePath, file, { upsert: true });
-
-      if (uploadError) throw uploadError;
-
-      const { data } = supabase.storage.from("avatars").getPublicUrl(filePath);
-      const publicUrl = data.publicUrl + `?t=${Date.now()}`; // bust cache
-
-      await supabase.from("profiles").upsert({
-        id: user.id,
-        avatar_url: data.publicUrl,
-        updated_at: new Date().toISOString(),
-      });
-
-      setAvatarUrl(publicUrl);
-    } catch (err) {
-      console.error("Avatar upload failed:", err);
-      alert("Failed to upload image. Please try again.");
-    } finally {
-      setUploadingAvatar(false);
-    }
   };
 
   const handleSignOut = async () => {
     await supabase.auth.signOut();
-    window.location.href = "/auth";
+    router.push('/auth');
   };
 
   if (loading) return (
-    <div style={{ background: "#0d0d0d", minHeight: "100vh", display: "flex", alignItems: "center", justifyContent: "center", color: "#f5a623", fontWeight: 700 }}>
-      Loading...
+    <div style={styles.loadingContainer}>
+      <div style={styles.spinner} />
     </div>
   );
 
-  const displayName = profile?.full_name || user?.email?.split("@")[0] || "User";
-  const initials = displayName[0]?.toUpperCase() || "U";
+  const activeCount = products.filter(p => p.status === 'active').length;
+  const soldCount = products.filter(p => p.status === 'sold').length;
 
   return (
-    <main style={{ backgroundColor: "#0d0d0d", color: "#fff", fontFamily: "'Segoe UI', sans-serif", maxWidth: 480, margin: "0 auto", minHeight: "100vh" }}>
-
-      {/* Header */}
-      <header style={{ background: "#111", padding: "14px 16px", display: "flex", alignItems: "center", justifyContent: "space-between", borderBottom: "1px solid #1a1a1a", position: "sticky", top: 0, zIndex: 40 }}>
-        <div>
-          <span style={{ fontWeight: 900, fontSize: 18, color: "#fff" }}>Ghana</span>
-          <span style={{ fontWeight: 900, fontSize: 18, color: "#f5a623" }}>Market</span>
-        </div>
-        <button onClick={handleSignOut} style={{ background: "#1a1a1a", border: "1px solid #2a2a2a", color: "#aaa", fontSize: 11, fontWeight: 600, padding: "6px 14px", borderRadius: 20, cursor: "pointer" }}>
-          Sign Out
-        </button>
-      </header>
-
-      {/* Hero Banner */}
-      <section style={{ position: "relative", height: 140, overflow: "hidden" }}>
-        <div style={{ position: "absolute", inset: 0, backgroundImage: "url('/banner2.png')", backgroundSize: "cover", backgroundPosition: "center" }} />
-        <div style={{ position: "absolute", inset: 0, background: "linear-gradient(to bottom, rgba(0,0,0,0.2), rgba(13,13,13,0.98))" }} />
-      </section>
+    <main style={styles.main}>
+      {/* Banner */}
+      <div style={styles.banner}>
+        <img src="/banner.png" alt="banner" style={styles.bannerImg} />
+        <div style={styles.bannerOverlay} />
+        <button onClick={handleSignOut} style={styles.signOutBtn}>Sign Out</button>
+      </div>
 
       {/* Avatar + Name */}
-      <section style={{ padding: "0 16px", marginTop: -40, position: "relative", zIndex: 2, marginBottom: 20 }}>
-        <div style={{ display: "flex", alignItems: "flex-end", gap: 14, marginBottom: 14 }}>
+      <div style={styles.avatarSection}>
+        <div style={styles.avatarCircle}>
+          {profile?.avatar_url
+            ? <img src={profile.avatar_url} alt="avatar" style={styles.avatarImg} />
+            : <span style={styles.avatarInitial}>
+                {profile?.full_name?.[0]?.toUpperCase() || profile?.email?.[0]?.toUpperCase() || '?'}
+              </span>
+          }
+        </div>
+        <div style={styles.nameBlock}>
+          <h2 style={styles.name}>{profile?.full_name || 'Your Name'}</h2>
+          <p style={styles.email}>{profile?.email}</p>
+          <p style={styles.memberSince}>
+            Ghana · Member since {new Date(profile?.created_at || '').getFullYear()}
+          </p>
+        </div>
+      </div>
 
-          {/* Avatar with upload options */}
-          <div style={{ position: "relative", flexShrink: 0 }}>
-            <div style={{ width: 76, height: 76, borderRadius: "50%", border: "3px solid #0d0d0d", overflow: "hidden", background: "#f5a623", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 28, fontWeight: 900, color: "#000" }}>
-              {avatarUrl ? (
-                <img src={avatarUrl} alt="avatar" style={{ width: "100%", height: "100%", objectFit: "cover" }} />
-              ) : initials}
-            </div>
+      {/* Stats */}
+      <div style={styles.statsRow}>
+        <div style={styles.statBox}>
+          <span style={styles.statNum}>{products.length}</span>
+          <span style={styles.statLabel}>Listings</span>
+        </div>
+        <div style={styles.statBox}>
+          <span style={styles.statNum}>{activeCount}</span>
+          <span style={styles.statLabel}>Active</span>
+        </div>
+        <div style={styles.statBox}>
+          <span style={styles.statNum}>{soldCount}</span>
+          <span style={styles.statLabel}>Sold</span>
+        </div>
+      </div>
 
-            {/* Camera icon overlay */}
-            <div style={{ position: "absolute", bottom: 0, right: 0, display: "flex", gap: 3 }}>
-              {/* Gallery button */}
-              <button
-                onClick={() => galleryInputRef.current?.click()}
-                disabled={uploadingAvatar}
-                title="Choose from gallery"
-                style={{ width: 24, height: 24, borderRadius: "50%", background: "#f5a623", border: "2px solid #0d0d0d", display: "flex", alignItems: "center", justifyContent: "center", cursor: "pointer", fontSize: 11 }}
-              >
-                🖼️
-              </button>
-              {/* Camera button */}
-              <button
-                onClick={() => cameraInputRef.current?.click()}
-                disabled={uploadingAvatar}
-                title="Take a photo"
-                style={{ width: 24, height: 24, borderRadius: "50%", background: "#f5a623", border: "2px solid #0d0d0d", display: "flex", alignItems: "center", justifyContent: "center", cursor: "pointer", fontSize: 11 }}
-              >
-                📷
-              </button>
-            </div>
-
-            {/* Hidden file inputs */}
+      {/* Account Info */}
+      <section style={styles.card}>
+        <p style={styles.cardTitle}>ACCOUNT INFO</p>
+        {editing ? (
+          <>
             <input
-              ref={galleryInputRef}
-              type="file"
-              accept="image/*"
-              style={{ display: "none" }}
-              onChange={e => e.target.files?.[0] && handleAvatarUpload(e.target.files[0])}
+              style={styles.input}
+              placeholder="Full Name"
+              value={form.full_name}
+              onChange={e => setForm({ ...form, full_name: e.target.value })}
             />
             <input
-              ref={cameraInputRef}
-              type="file"
-              accept="image/*"
-              capture="user"
-              style={{ display: "none" }}
-              onChange={e => e.target.files?.[0] && handleAvatarUpload(e.target.files[0])}
+              style={styles.input}
+              placeholder="Phone"
+              value={form.phone}
+              onChange={e => setForm({ ...form, phone: e.target.value })}
             />
-          </div>
-
-          <div style={{ paddingBottom: 6 }}>
-            <h2 style={{ margin: "0 0 2px", fontSize: 18, fontWeight: 900 }}>{displayName}</h2>
-            <p style={{ margin: "0 0 2px", fontSize: 11, color: "#888" }}>
-              {user?.email}
-            </p>
-            <p style={{ margin: 0, fontSize: 11, color: "#666" }}>
-              {profile?.location || "Ghana"} · Member since {profile?.created_at ? new Date(profile.created_at).getFullYear() : new Date().getFullYear()}
-            </p>
-            {uploadingAvatar && (
-              <p style={{ margin: "4px 0 0", fontSize: 10, color: "#f5a623" }}>Uploading photo...</p>
-            )}
-          </div>
-        </div>
-
-        {/* Registration info card */}
-        <div style={{ background: "#111", borderRadius: 14, padding: "12px 16px", border: "1px solid #1e1e1e", marginBottom: 16 }}>
-          <p style={{ margin: "0 0 8px", fontSize: 11, color: "#555", fontWeight: 700, textTransform: "uppercase", letterSpacing: 1 }}>Account Info</p>
-          {[
-            { label: "Email", value: user?.email },
-            { label: "Phone", value: profile?.phone || "—" },
-            { label: "Location", value: profile?.location || "—" },
-          ].map(item => (
-            <div key={item.label} style={{ display: "flex", justifyContent: "space-between", paddingBottom: 6, marginBottom: 6, borderBottom: "1px solid #1a1a1a" }}>
-              <span style={{ fontSize: 12, color: "#666" }}>{item.label}</span>
-              <span style={{ fontSize: 12, color: "#ddd", fontWeight: 600 }}>{item.value}</span>
+            <input
+              style={styles.input}
+              placeholder="Location"
+              value={form.location}
+              onChange={e => setForm({ ...form, location: e.target.value })}
+            />
+            <div style={styles.editBtnRow}>
+              <button onClick={handleSave} style={styles.saveBtn}>Save</button>
+              <button onClick={() => setEditing(false)} style={styles.cancelBtn}>Cancel</button>
             </div>
-          ))}
-        </div>
-
-        {/* Stats */}
-        <div style={{ display: "flex", gap: 10, marginBottom: 16 }}>
-          {[
-            { label: "Listings", value: myProducts.length },
-            { label: "Active", value: myProducts.length },
-            { label: "Sold", value: 0 },
-          ].map(s => (
-            <div key={s.label} style={{ flex: 1, background: "#111", borderRadius: 12, padding: "12px 10px", textAlign: "center", border: "1px solid #1e1e1e" }}>
-              <div style={{ fontSize: 20, fontWeight: 900, color: "#f5a623" }}>{s.value}</div>
-              <div style={{ fontSize: 9, color: "#666", marginTop: 2 }}>{s.label}</div>
-            </div>
-          ))}
-        </div>
-
-        {/* Edit Profile Button */}
-        <button
-          onClick={() => setEditing(!editing)}
-          style={{ width: "100%", background: editing ? "#1a1a1a" : "#f5a623", color: editing ? "#aaa" : "#000", fontWeight: 800, fontSize: 13, padding: "12px", borderRadius: 12, border: editing ? "1px solid #2a2a2a" : "none", cursor: "pointer", marginBottom: 16 }}
-        >
-          {editing ? "✕ Cancel" : "✏️ Edit Profile"}
-        </button>
-
-        {/* Edit Form */}
-        {editing && (
-          <div style={{ background: "#111", borderRadius: 16, padding: 16, border: "1px solid #1e1e1e", marginBottom: 16 }}>
-            {[
-              { key: "full_name", label: "Full Name", placeholder: "Your full name" },
-              { key: "phone", label: "Phone Number", placeholder: "e.g. 0244123456" },
-              { key: "location", label: "Location", placeholder: "e.g. Accra, Ghana" },
-            ].map(f => (
-              <div key={f.key} style={{ marginBottom: 12 }}>
-                <label style={{ fontSize: 11, color: "#888", display: "block", marginBottom: 4 }}>{f.label}</label>
-                <input
-                  type="text"
-                  placeholder={f.placeholder}
-                  value={(form as any)[f.key]}
-                  onChange={e => setForm(prev => ({ ...prev, [f.key]: e.target.value }))}
-                  style={{ width: "100%", background: "#1a1a1a", border: "1px solid #2a2a2a", borderRadius: 10, padding: "10px 12px", color: "#fff", fontSize: 13, boxSizing: "border-box" }}
-                />
-              </div>
-            ))}
-            <button
-              onClick={saveProfile}
-              disabled={saving}
-              style={{ width: "100%", background: saving ? "#333" : "#f5a623", color: saving ? "#666" : "#000", fontWeight: 800, fontSize: 14, padding: 12, borderRadius: 12, border: "none", cursor: saving ? "not-allowed" : "pointer" }}
-            >
-              {saving ? "Saving..." : "Save Changes"}
-            </button>
-          </div>
+          </>
+        ) : (
+          <>
+            <InfoRow label="Email" value={profile?.email || '—'} />
+            <InfoRow label="Phone" value={profile?.phone || '—'} />
+            <InfoRow label="Location" value={profile?.location || '—'} />
+            <button onClick={() => setEditing(true)} style={styles.editBtn}>✏️ Edit Profile</button>
+          </>
         )}
       </section>
 
       {/* My Listings */}
-      <section style={{ padding: "0 16px" }}>
-        <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 14 }}>
-          <h2 style={{ margin: 0, fontSize: 16, fontWeight: 800 }}>My Listings</h2>
-          <a href="/seller/dashboard" style={{ color: "#f5a623", fontSize: 12, fontWeight: 600, textDecoration: "none" }}>Manage →</a>
+      <section style={styles.listingsSection}>
+        <div style={styles.listingsHeader}>
+          <h3 style={styles.listingsTitle}>My Listings</h3>
+          <a href="/products/manage" style={styles.manageLink}>Manage →</a>
         </div>
-
-        {myProducts.length === 0 ? (
-          <div style={{ background: "#111", borderRadius: 16, padding: "40px 20px", textAlign: "center", border: "1px dashed #2a2a2a" }}>
-            <div style={{ fontSize: 36, marginBottom: 10 }}>📦</div>
-            <p style={{ color: "#555", fontSize: 13, margin: "0 0 14px" }}>No listings yet</p>
-            <a href="/seller/dashboard" style={{ background: "#f5a623", color: "#000", fontWeight: 800, fontSize: 12, padding: "10px 20px", borderRadius: 20, textDecoration: "none" }}>
-              + Add Product
-            </a>
-          </div>
+        {products.length === 0 ? (
+          <p style={styles.emptyText}>No listings yet.</p>
         ) : (
-          <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
-            {myProducts.map(p => (
-              <a key={p.id} href={`/products/${p.id}`} style={{ textDecoration: "none", color: "inherit" }}>
-                <div style={{ background: "#111", borderRadius: 14, border: "1px solid #1e1e1e", display: "flex", gap: 12, padding: 10, alignItems: "center" }}>
-                  <div style={{ width: 60, height: 60, borderRadius: 10, overflow: "hidden", background: "#1a1a1a", flexShrink: 0 }}>
-                    {p.image_url ? (
-                      <img src={p.image_url} style={{ width: "100%", height: "100%", objectFit: "cover" }} />
-                    ) : (
-                      <div style={{ width: "100%", height: "100%", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 22 }}>🛍️</div>
-                    )}
-                  </div>
-                  <div style={{ flex: 1, minWidth: 0 }}>
-                    <p style={{ margin: "0 0 2px", fontWeight: 700, fontSize: 13, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{p.name}</p>
-                    <p style={{ margin: "0 0 4px", fontSize: 14, fontWeight: 900, color: "#f5a623" }}>GH₵ {Number(p.price).toLocaleString()}</p>
-                    <span style={{ background: "#1a2a0a", color: "#5d0", fontSize: 9, fontWeight: 700, padding: "2px 8px", borderRadius: 8 }}>Active</span>
-                  </div>
-                </div>
-              </a>
-            ))}
-          </div>
+          products.map(p => (
+            <div key={p.id} style={styles.productCard}>
+              <img src={p.image_url} alt={p.title} style={styles.productImg} />
+              <div>
+                <p style={styles.productTitle}>{p.title}</p>
+                <p style={styles.productPrice}>GH₵ {p.price}</p>
+                <span style={{
+                  ...styles.badge,
+                  background: p.status === 'active' ? '#1a3a1a' : '#3a1a1a',
+                  color: p.status === 'active' ? '#4caf50' : '#f44336',
+                }}>
+                  {p.status}
+                </span>
+              </div>
+            </div>
+          ))
         )}
       </section>
 
@@ -308,3 +201,54 @@ export default function ProfilePage() {
     </main>
   );
 }
+
+function InfoRow({ label, value }: { label: string; value: string }) {
+  return (
+    <div style={styles.infoRow}>
+      <span style={styles.infoLabel}>{label}</span>
+      <span style={styles.infoValue}>{value}</span>
+    </div>
+  );
+}
+
+const styles: Record<string, React.CSSProperties> = {
+  main: { background: '#0a0a0a', minHeight: '100vh', color: '#fff', fontFamily: 'sans-serif' },
+  loadingContainer: { display: 'flex', justifyContent: 'center', alignItems: 'center', height: '100vh', background: '#0a0a0a' },
+  spinner: { width: 40, height: 40, border: '4px solid #333', borderTop: '4px solid #f5a623', borderRadius: '50%', animation: 'spin 0.8s linear infinite' },
+  banner: { position: 'relative', height: 180, overflow: 'hidden' },
+  bannerImg: { width: '100%', height: '100%', objectFit: 'cover' },
+  bannerOverlay: { position: 'absolute', inset: 0, background: 'rgba(0,0,0,0.45)' },
+  signOutBtn: { position: 'absolute', top: 16, right: 16, background: 'rgba(255,255,255,0.15)', border: '1px solid rgba(255,255,255,0.3)', color: '#fff', padding: '8px 16px', borderRadius: 20, cursor: 'pointer', backdropFilter: 'blur(4px)' },
+  avatarSection: { display: 'flex', alignItems: 'center', gap: 16, padding: '0 20px', marginTop: -40, position: 'relative', zIndex: 10 },
+  avatarCircle: { width: 80, height: 80, borderRadius: '50%', background: '#f5a623', border: '3px solid #0a0a0a', display: 'flex', alignItems: 'center', justifyContent: 'center', overflow: 'hidden', flexShrink: 0 },
+  avatarImg: { width: '100%', height: '100%', objectFit: 'cover' },
+  avatarInitial: { fontSize: 32, fontWeight: 700, color: '#0a0a0a' },
+  nameBlock: { marginTop: 20 },
+  name: { margin: 0, fontSize: 20, fontWeight: 700, color: '#fff' },
+  email: { margin: '2px 0', fontSize: 13, color: '#aaa' },
+  memberSince: { margin: 0, fontSize: 12, color: '#777' },
+  statsRow: { display: 'flex', gap: 12, padding: '20px 20px 0' },
+  statBox: { flex: 1, background: '#1a1a1a', borderRadius: 12, padding: '16px 0', display: 'flex', flexDirection: 'column', alignItems: 'center' },
+  statNum: { fontSize: 22, fontWeight: 700, color: '#f5a623' },
+  statLabel: { fontSize: 12, color: '#888', marginTop: 4 },
+  card: { background: '#111', borderRadius: 16, margin: '20px', padding: '20px' },
+  cardTitle: { fontSize: 11, color: '#666', letterSpacing: 1.5, marginBottom: 16, marginTop: 0 },
+  infoRow: { display: 'flex', justifyContent: 'space-between', padding: '12px 0', borderBottom: '1px solid #222' },
+  infoLabel: { color: '#888', fontSize: 14 },
+  infoValue: { color: '#fff', fontSize: 14 },
+  input: { width: '100%', background: '#1a1a1a', border: '1px solid #333', borderRadius: 10, padding: '12px', color: '#fff', fontSize: 14, marginBottom: 10, boxSizing: 'border-box' },
+  editBtn: { width: '100%', background: '#f5a623', border: 'none', borderRadius: 12, padding: '14px', color: '#000', fontWeight: 700, fontSize: 15, cursor: 'pointer', marginTop: 16 },
+  editBtnRow: { display: 'flex', gap: 10, marginTop: 8 },
+  saveBtn: { flex: 1, background: '#f5a623', border: 'none', borderRadius: 10, padding: 12, color: '#000', fontWeight: 700, cursor: 'pointer' },
+  cancelBtn: { flex: 1, background: '#222', border: 'none', borderRadius: 10, padding: 12, color: '#fff', cursor: 'pointer' },
+  listingsSection: { padding: '0 20px' },
+  listingsHeader: { display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 12 },
+  listingsTitle: { margin: 0, fontSize: 18, fontWeight: 700 },
+  manageLink: { color: '#f5a623', textDecoration: 'none', fontSize: 14 },
+  emptyText: { color: '#555', textAlign: 'center', padding: '30px 0' },
+  productCard: { display: 'flex', gap: 14, background: '#111', borderRadius: 12, padding: 14, marginBottom: 10 },
+  productImg: { width: 70, height: 70, borderRadius: 8, objectFit: 'cover' },
+  productTitle: { margin: '0 0 4px', fontWeight: 600, fontSize: 15 },
+  productPrice: { margin: '0 0 6px', color: '#f5a623', fontWeight: 700 },
+  badge: { padding: '3px 10px', borderRadius: 20, fontSize: 12, fontWeight: 600 },
+};
