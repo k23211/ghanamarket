@@ -184,28 +184,26 @@ export default function ProductDetailPage() {
       </section>
 
       {/* Action Buttons */}
-      <div style={{
-        position: "fixed",
-        bottom: 70,
-        left: "50%",
-        transform: "translateX(-50%)",
-        width: "100%",
-        maxWidth: 480,
-        padding: "12px 16px",
-        background: "linear-gradient(to top, #0d0d0d 80%, transparent)",
-        display: "flex",
-        gap: 10,
-        boxSizing: "border-box",
-        zIndex: 30,
-      }}>
-        {seller?.phone && (
+      {seller?.phone && (
+        <div style={{
+          position: "fixed",
+          bottom: 70,
+          left: "50%",
+          transform: "translateX(-50%)",
+          width: "100%",
+          maxWidth: 480,
+          padding: "12px 16px",
+          background: "linear-gradient(to top, #0d0d0d 80%, transparent)",
+          display: "flex",
+          boxSizing: "border-box",
+          zIndex: 30,
+        }}>
           <a
-            href={`tel:${seller.phone}`}
+            href={"tel:" + seller.phone}
             style={{
               flex: 1,
-              background: "#1a1a1a",
-              border: "1px solid #2a2a2a",
-              color: "#fff",
+              background: "#f5a623",
+              color: "#000",
               fontWeight: 800,
               fontSize: 14,
               padding: "14px",
@@ -216,25 +214,8 @@ export default function ProductDetailPage() {
           >
             📞 Call Seller
           </a>
-        )}
-        {/* FIX: Replaced WhatsApp wa.me link with in-app chat route */}
-        <a
-          href={`/chat/${product.seller_id}?product=${product.id}`}
-          style={{
-            flex: 2,
-            background: "#f5a623",
-            color: "#000",
-            fontWeight: 800,
-            fontSize: 14,
-            padding: "14px",
-            borderRadius: 14,
-            textAlign: "center",
-            textDecoration: "none",
-          }}
-        >
-          💬 Chat with Seller
-        </a>
-      </div>
+        </div>
+      )}
 
       <div style={{ paddingBottom: 160 }} />
       <BottomNav />
