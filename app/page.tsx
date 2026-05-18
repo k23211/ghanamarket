@@ -124,6 +124,45 @@ export default function HomePage() {
         </div>
       </section>
 
+      {/* ── Job Section ── */}
+      <section style={{ marginTop: 16, padding: "0 16px" }}>
+        <div style={{
+          position: "relative",
+          overflow: "hidden",
+          borderRadius: 24,
+          minHeight: 260,
+          backgroundImage: "url('/job.png')",
+          backgroundSize: "cover",
+          backgroundPosition: "center",
+          border: "1px solid rgba(255,255,255,0.08)",
+        }}>
+          <div style={{ position: "absolute", inset: 0, background: "linear-gradient(180deg, rgba(0,0,0,0.3) 0%, rgba(0,0,0,0.75) 100%)" }} />
+          <div style={{ position: "relative", zIndex: 2, padding: 24, display: "flex", flexDirection: "column", justifyContent: "space-between", height: "100%" }}>
+            <div>
+              <div style={{ display: "inline-flex", alignItems: "center", gap: 6, marginBottom: 12, color: "#f5a623", fontSize: 12, fontWeight: 700 }}>
+                <span style={{ width: 22, height: 22, borderRadius: 999, background: "rgba(245,166,35,0.2)", display: "inline-flex", alignItems: "center", justifyContent: "center" }}>💼</span>
+                Jobs for Everyone
+              </div>
+              <h2 style={{ margin: 0, fontSize: 22, fontWeight: 900, color: "#fff", lineHeight: 1.1 }}>Find your next opportunity with GhanaMarket Jobs</h2>
+              <p style={{ margin: "12px 0 0", color: "#ddd", fontSize: 13, maxWidth: 380 }}>Explore verified roles across Ghana, from field work to tech, healthcare, and more.</p>
+            </div>
+            <div style={{ display: "grid", gap: 12, marginTop: 20 }}>
+              <div style={{ display: "grid", gridTemplateColumns: "1fr auto", gap: 10, background: "rgba(255,255,255,0.08)", borderRadius: 16, padding: "12px 14px", alignItems: "center" }}>
+                <input type="text" placeholder="Search jobs by title, company or keyword..." style={{ width: "100%", background: "transparent", border: "none", outline: "none", color: "#fff", fontSize: 13 }} />
+                <button style={{ background: "#f5a623", color: "#000", border: "none", borderRadius: 14, padding: "10px 16px", fontWeight: 700, cursor: "pointer" }}>Search</button>
+              </div>
+              <div style={{ display: "flex", flexWrap: "wrap", gap: 10 }}>
+                {["All Jobs", "IT & Tech", "Sales & Marketing", "Education", "Healthcare"].map(label => (
+                  <button key={label} style={{ background: "rgba(255,255,255,0.1)", border: "1px solid rgba(255,255,255,0.12)", borderRadius: 14, color: "#fff", fontSize: 12, padding: "10px 14px", cursor: "pointer" }}>
+                    {label}
+                  </button>
+                ))}
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
       {/* ── Features strip ── */}
       <section style={{ background: "#111", padding: "14px 16px", borderTop: "1px solid #1a1a1a", borderBottom: "1px solid #1a1a1a" }}>
         <div style={{ display: "flex", justifyContent: "space-between" }}>
