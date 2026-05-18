@@ -117,7 +117,7 @@ export default function AccountPage() {
       return;
     }
 
-    setProfile(prev => prev ? { ...prev, ...form } : ({ id: user.id, full_name: form.full_name, email: user.email, phone: form.phone, location: form.location, avatar_url: prev?.avatar_url || null, created_at: prev?.created_at || new Date().toISOString() } as Profile));
+    setProfile(prev => prev ? { ...prev, ...form } : ({ id: user.id, full_name: form.full_name, email: user.email, phone: form.phone, location: form.location, avatar_url: null, created_at: new Date().toISOString() } as Profile));
     setEditing(false);
     setStatusMessage('Profile saved successfully.');
   };
