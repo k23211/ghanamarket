@@ -168,7 +168,7 @@ export default function AccountPage() {
       .from('avatars')
       .getPublicUrl(filePath);
 
-    const publicUrl = urlResult?.data?.publicUrl || urlResult?.publicUrl || urlResult?.data?.public_url || null;
+    const publicUrl = urlResult?.data?.publicUrl || urlResult?.publicUrl || null;
     if (!publicUrl) {
       console.error('GetPublicUrl error:', urlResult);
       setErrorMessage('Could not get image URL.');

@@ -117,7 +117,7 @@ export default function SellerDashboard() {
       const { error: upErr } = await supabase.storage.from('products').upload(path, editImageFile, { upsert: true });
       if (!upErr) {
         const { data } = supabase.storage.from('products').getPublicUrl(path);
-        image_url = data?.publicUrl || data?.public_url || image_url;
+        image_url = data?.publicUrl || image_url;
       }
       setEditingUploading(false);
     }
