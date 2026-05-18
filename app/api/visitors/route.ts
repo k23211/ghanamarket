@@ -5,53 +5,61 @@ const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL!
 const supabaseKey = process.env.SUPABASE_SERVICE_ROLE_KEY || process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
 const supabase = createClient(supabaseUrl, supabaseKey)
 
+function formatDate(date: Date) {
+  const year = date.getFullYear()
+  const month = String(date.getMonth() + 1).padStart(2, '0')
+  const day = String(date.getDate()).padStart(2, '0')
+  return { dailyId: `daily-${year}-${month}-${day}`, monthlyId: `monthly-${year}-${month}` }
+}
+
+async function fetchCounts() {
+  const { dailyId, monthlyId } = formatDate(new Date())
+  const ids = ['global', dailyId, monthlyId]
+  const { data, error } = await supabase
+    .from('visitor_counts')
+    .select('id, count')
+    .in('id', ids)
+
+  const rowMap = ((data || []) as Array<{ id: string; count: number }>).reduce<Record<string, number>>((acc, row) => {
+    acc[row.id] = row.count
+    return acc
+  }, {})
+
+  return {
+    count: rowMap['global'] ?? 0,
+    todayCount: rowMap[dailyId] ?? 0,
+    monthCount: rowMap[monthlyId] ?? 0,
+  }
+}
+
 export async function GET() {
   try {
-    const { data, error } = await supabase
-      .from('visitor_counts')
-      .select('count')
-      .eq('id', 'global')
-      .single()
-
-    if (error) {
-      return NextResponse.json({ count: 0 })
-    }
-
-    return NextResponse.json({ count: data?.count ?? 0 })
+    return NextResponse.json(await fetchCounts())
   } catch (err) {
-    return NextResponse.json({ count: 0 }, { status: 500 })
+    return NextResponse.json({ count: 0, todayCount: 0, monthCount: 0 }, { status: 500 })
   }
 }
 
 export async function POST() {
   try {
-    const { data: existing } = await supabase
+    const { dailyId, monthlyId } = formatDate(new Date())
+    const counts = await fetchCounts()
+    const rows = [
+      { id: 'global', count: counts.count + 1 },
+      { id: dailyId, count: counts.todayCount + 1 },
+      { id: monthlyId, count: counts.monthCount + 1 },
+    ]
+
+    const { error } = await supabase
       .from('visitor_counts')
-      .select('count')
-      .eq('id', 'global')
-      .single()
+      .upsert(rows, { onConflict: 'id' })
 
-    if (existing && typeof existing.count === 'number') {
-      const { data, error } = await supabase
-        .from('visitor_counts')
-        .update({ count: existing.count + 1 })
-        .eq('id', 'global')
-        .select()
-        .single()
-
-      if (error) return NextResponse.json({ count: existing.count + 1 })
-      return NextResponse.json({ count: data?.count ?? existing.count + 1 })
+    if (error) {
+      return NextResponse.json({ count: counts.count + 1, todayCount: counts.todayCount + 1, monthCount: counts.monthCount + 1 })
     }
 
-    const { data, error } = await supabase
-      .from('visitor_counts')
-      .insert([{ id: 'global', count: 1 }])
-      .select()
-      .single()
-
-    if (error) return NextResponse.json({ count: 1 })
-    return NextResponse.json({ count: data?.count ?? 1 })
+    return NextResponse.json({ count: rows[0].count, todayCount: rows[1].count, monthCount: rows[2].count })
   } catch (err) {
-    return NextResponse.json({ count: 0 }, { status: 500 })
+    return NextResponse.json({ count: 0, todayCount: 0, monthCount: 0 }, { status: 500 })
   }
 }

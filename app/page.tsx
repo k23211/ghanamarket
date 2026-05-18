@@ -142,15 +142,15 @@ export default function HomePage() {
       </section>
 
       <section style={{ padding: "20px 16px", marginTop: 14 }}>
-        <div style={{ display: 'flex', flexDirection: 'column', gap: 14, background: '#111', border: '1px solid #1a1a1a', borderRadius: 18, padding: 18 }}>
+        <div style={{ display: 'flex', flexDirection: 'column', gap: 18, background: 'linear-gradient(180deg, #151212 0%, #0d0d0d 100%)', border: '1px solid rgba(245,166,35,0.2)', borderRadius: 24, padding: 20, boxShadow: '0 20px 45px rgba(0,0,0,0.17)' }}>
           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', gap: 12, flexWrap: 'wrap' }}>
             <div>
-              <p style={{ margin: 0, fontSize: 14, fontWeight: 700, color: '#f5a623' }}>Visitor Count</p>
-              <p style={{ margin: '6px 0 0', fontSize: 12, color: '#aaa' }}>Track how many people have visited GhanaMarket.</p>
+              <p style={{ margin: 0, fontSize: 16, fontWeight: 900, color: '#fff' }}>Visitor Stats</p>
+              <p style={{ margin: '6px 0 0', fontSize: 12, color: '#ccc' }}>See total, daily, and monthly visits at a glance.</p>
             </div>
-            <div style={{ color: '#888', fontSize: 11 }}>Updated every visit</div>
+            <div style={{ color: '#f5a623', fontSize: 11, fontWeight: 700 }}>Live updates on each page load</div>
           </div>
-          <div style={{ display: 'flex', justifyContent: 'center', padding: 14, background: '#0d0d0d', borderRadius: 16 }}>
+          <div style={{ display: 'flex', justifyContent: 'center', padding: 16, background: '#0b0b0b', borderRadius: 20, border: '1px solid rgba(255,255,255,0.04)' }}>
             <VisitorCount />
           </div>
         </div>
