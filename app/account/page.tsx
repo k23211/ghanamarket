@@ -114,14 +114,12 @@ export default function AccountPage() {
       location: form.location,
     };
 
-    let error;
-    if (profile?.id) {
-      const { error: updateError } = await supabase.from('profiles').update(payload).eq('id', user.id);
-      error = updateError;
-    } else {
-      const { error: insertError } = await supabase.from('profiles').insert({ id: user.id, email: user.email, ...payload });
-      error = insertError;
+    if (!profile?.id) {
+      setErrorMessage('Profile not ready yet. Refresh and try again.');
+      return;
     }
+
+    const { error } = await supabase.from('profiles').update(payload).eq('id', user.id);
 
     if (error) {
       console.error('Save error:', error.message);
@@ -177,18 +175,32 @@ export default function AccountPage() {
       return;
     }
 
-    // Persist avatar URL using update when the profile exists
-    let updateError;
-    if (profile?.id) {
-      const result = await supabase.from('profiles').update({ avatar_url: publicUrl }).eq('id', user.id);
-      updateError = result.error;
-    } else {
-      const result = await supabase.from('profiles').insert({ id: user.id, email: user.email, avatar_url: publicUrl });
-      updateError = result.error;
+    // Confirm the profile row exists on the server, then update or insert as needed.
+    const { data: existingProfile, error: fetchError } = await supabase
+      .from('profiles')
+      .select('id')
+      .eq('id', user.id)
+      .maybeSingle();
+
+    if (fetchError) {
+      console.error('Profile fetch error:', fetchError.message, fetchError);
+      setErrorMessage('Could not verify profile before saving photo.');
+      setAvatarUploading(false);
+      return;
     }
 
-    if (updateError) {
-      console.error('Avatar save error:', updateError.message, updateError);
+    if (!existingProfile) {
+      setErrorMessage('Your profile row is not ready yet. Please refresh or reopen the app.');
+      setAvatarUploading(false);
+      return;
+    }
+
+    const { error: saveError } = await supabase.from('profiles')
+      .update({ avatar_url: publicUrl })
+      .eq('id', user.id);
+
+    if (saveError) {
+      console.error('Avatar save error:', saveError.message, saveError);
       setErrorMessage('Could not save image to profile.');
       setAvatarUploading(false);
       return;

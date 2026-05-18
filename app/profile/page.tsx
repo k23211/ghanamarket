@@ -149,18 +149,24 @@ export default function AccountPage() {
       return;
     }
 
-    const { data: urlData } = supabase.storage
+    const urlResult: any = supabase.storage
       .from('avatars')
       .getPublicUrl(filePath);
 
-    if (!urlData?.publicUrl) {
-      console.error('URL error');
+    const publicUrl = urlResult?.data?.publicUrl || urlResult?.publicUrl || urlResult?.data?.public_url || null;
+    if (!publicUrl) {
+      console.error('GetPublicUrl error:', urlResult);
       setErrorMessage('Could not get image URL.');
       setAvatarUploading(false);
       return;
     }
 
-    const publicUrl = urlData.publicUrl;
+    if (!profile?.id) {
+      setErrorMessage('Profile not ready yet. Refresh and try again.');
+      setAvatarUploading(false);
+      return;
+    }
+
     const { error: updateError } = await supabase
       .from('profiles')
       .update({ avatar_url: publicUrl })
