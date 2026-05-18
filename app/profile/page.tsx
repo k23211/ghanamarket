@@ -1,8 +1,8 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-import { createClientComponentClient } from '@supabase/auth-helpers-nextjs';
 import { useRouter } from 'next/navigation';
+import { supabase } from '../../lib/supabase';
 import BottomNav from '../components/BottomNav';
 
 interface Profile {
@@ -24,7 +24,6 @@ interface Product {
 }
 
 export default function ProfilePage() {
-  const supabase = createClientComponentClient();
   const router = useRouter();
   const [profile, setProfile] = useState<Profile | null>(null);
   const [products, setProducts] = useState<Product[]>([]);
@@ -88,14 +87,12 @@ export default function ProfilePage() {
 
   return (
     <main style={styles.main}>
-      {/* Banner */}
       <div style={styles.banner}>
         <img src="/banner.png" alt="banner" style={styles.bannerImg} />
         <div style={styles.bannerOverlay} />
         <button onClick={handleSignOut} style={styles.signOutBtn}>Sign Out</button>
       </div>
 
-      {/* Avatar + Name */}
       <div style={styles.avatarSection}>
         <div style={styles.avatarCircle}>
           {profile?.avatar_url
@@ -114,7 +111,6 @@ export default function ProfilePage() {
         </div>
       </div>
 
-      {/* Stats */}
       <div style={styles.statsRow}>
         <div style={styles.statBox}>
           <span style={styles.statNum}>{products.length}</span>
@@ -130,29 +126,16 @@ export default function ProfilePage() {
         </div>
       </div>
 
-      {/* Account Info */}
       <section style={styles.card}>
         <p style={styles.cardTitle}>ACCOUNT INFO</p>
         {editing ? (
           <>
-            <input
-              style={styles.input}
-              placeholder="Full Name"
-              value={form.full_name}
-              onChange={e => setForm({ ...form, full_name: e.target.value })}
-            />
-            <input
-              style={styles.input}
-              placeholder="Phone"
-              value={form.phone}
-              onChange={e => setForm({ ...form, phone: e.target.value })}
-            />
-            <input
-              style={styles.input}
-              placeholder="Location"
-              value={form.location}
-              onChange={e => setForm({ ...form, location: e.target.value })}
-            />
+            <input style={styles.input} placeholder="Full Name"
+              value={form.full_name} onChange={e => setForm({ ...form, full_name: e.target.value })} />
+            <input style={styles.input} placeholder="Phone"
+              value={form.phone} onChange={e => setForm({ ...form, phone: e.target.value })} />
+            <input style={styles.input} placeholder="Location"
+              value={form.location} onChange={e => setForm({ ...form, location: e.target.value })} />
             <div style={styles.editBtnRow}>
               <button onClick={handleSave} style={styles.saveBtn}>Save</button>
               <button onClick={() => setEditing(false)} style={styles.cancelBtn}>Cancel</button>
@@ -168,7 +151,6 @@ export default function ProfilePage() {
         )}
       </section>
 
-      {/* My Listings */}
       <section style={styles.listingsSection}>
         <div style={styles.listingsHeader}>
           <h3 style={styles.listingsTitle}>My Listings</h3>
@@ -187,9 +169,7 @@ export default function ProfilePage() {
                   ...styles.badge,
                   background: p.status === 'active' ? '#1a3a1a' : '#3a1a1a',
                   color: p.status === 'active' ? '#4caf50' : '#f44336',
-                }}>
-                  {p.status}
-                </span>
+                }}>{p.status}</span>
               </div>
             </div>
           ))
@@ -218,13 +198,13 @@ const styles: Record<string, React.CSSProperties> = {
   banner: { position: 'relative', height: 180, overflow: 'hidden' },
   bannerImg: { width: '100%', height: '100%', objectFit: 'cover' },
   bannerOverlay: { position: 'absolute', inset: 0, background: 'rgba(0,0,0,0.45)' },
-  signOutBtn: { position: 'absolute', top: 16, right: 16, background: 'rgba(255,255,255,0.15)', border: '1px solid rgba(255,255,255,0.3)', color: '#fff', padding: '8px 16px', borderRadius: 20, cursor: 'pointer', backdropFilter: 'blur(4px)' },
+  signOutBtn: { position: 'absolute', top: 16, right: 16, background: 'rgba(255,255,255,0.15)', border: '1px solid rgba(255,255,255,0.3)', color: '#fff', padding: '8px 16px', borderRadius: 20, cursor: 'pointer' },
   avatarSection: { display: 'flex', alignItems: 'center', gap: 16, padding: '0 20px', marginTop: -40, position: 'relative', zIndex: 10 },
   avatarCircle: { width: 80, height: 80, borderRadius: '50%', background: '#f5a623', border: '3px solid #0a0a0a', display: 'flex', alignItems: 'center', justifyContent: 'center', overflow: 'hidden', flexShrink: 0 },
   avatarImg: { width: '100%', height: '100%', objectFit: 'cover' },
   avatarInitial: { fontSize: 32, fontWeight: 700, color: '#0a0a0a' },
   nameBlock: { marginTop: 20 },
-  name: { margin: 0, fontSize: 20, fontWeight: 700, color: '#fff' },
+  name: { margin: 0, fontSize: 20, fontWeight: 700 },
   email: { margin: '2px 0', fontSize: 13, color: '#aaa' },
   memberSince: { margin: 0, fontSize: 12, color: '#777' },
   statsRow: { display: 'flex', gap: 12, padding: '20px 20px 0' },

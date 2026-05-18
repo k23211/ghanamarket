@@ -1,8 +1,8 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-import { createClientComponentClient } from '@supabase/auth-helpers-nextjs';
 import { useParams } from 'next/navigation';
+import { supabase } from '../../../lib/supabase';
 import BottomNav from '../../components/BottomNav';
 
 interface Profile {
@@ -24,7 +24,6 @@ interface Product {
 }
 
 export default function PublicProfilePage() {
-  const supabase = createClientComponentClient();
   const params = useParams();
   const sellerId = params?.id as string;
   const [profile, setProfile] = useState<Profile | null>(null);
@@ -55,27 +54,21 @@ export default function PublicProfilePage() {
   }, [sellerId]);
 
   if (loading) return (
-    <div style={styles.loadingContainer}>
-      <div style={styles.spinner} />
-    </div>
+    <div style={styles.loadingContainer}><div style={styles.spinner} /></div>
   );
 
   if (!profile) return (
-    <div style={styles.loadingContainer}>
-      <p style={{ color: '#888' }}>Seller not found.</p>
-    </div>
+    <div style={styles.loadingContainer}><p style={{ color: '#888' }}>Seller not found.</p></div>
   );
 
   return (
     <main style={styles.main}>
-      {/* Banner */}
       <div style={styles.banner}>
         <img src="/banner.png" alt="banner" style={styles.bannerImg} />
         <div style={styles.bannerOverlay} />
         <button onClick={() => window.history.back()} style={styles.backBtn}>← Back</button>
       </div>
 
-      {/* Avatar + Name */}
       <div style={styles.avatarSection}>
         <div style={styles.avatarCircle}>
           {profile.avatar_url
@@ -87,13 +80,10 @@ export default function PublicProfilePage() {
         </div>
         <div style={styles.nameBlock}>
           <h2 style={styles.name}>{profile.full_name || 'Seller'}</h2>
-          <p style={styles.memberSince}>
-            Ghana · Member since {new Date(profile.created_at).getFullYear()}
-          </p>
+          <p style={styles.memberSince}>Ghana · Member since {new Date(profile.created_at).getFullYear()}</p>
         </div>
       </div>
 
-      {/* Stats */}
       <div style={styles.statsRow}>
         <div style={styles.statBox}>
           <span style={styles.statNum}>{products.length}</span>
@@ -107,7 +97,6 @@ export default function PublicProfilePage() {
         )}
       </div>
 
-      {/* Contact */}
       {profile.phone && (
         <div style={styles.contactCard}>
           <a href={`tel:${profile.phone}`} style={styles.callBtn}>📞 Call Seller</a>
@@ -115,22 +104,20 @@ export default function PublicProfilePage() {
         </div>
       )}
 
-      {/* Listings */}
       <section style={styles.listingsSection}>
         <h3 style={styles.listingsTitle}>Active Listings</h3>
-        {products.length === 0 ? (
-          <p style={styles.emptyText}>No active listings.</p>
-        ) : (
-          <div style={styles.grid}>
-            {products.map(p => (
-              <a key={p.id} href={`/products/${p.id}`} style={styles.gridCard}>
-                <img src={p.image_url} alt={p.title} style={styles.gridImg} />
-                <p style={styles.gridTitle}>{p.title}</p>
-                <p style={styles.gridPrice}>GH₵ {p.price}</p>
-              </a>
-            ))}
-          </div>
-        )}
+        {products.length === 0
+          ? <p style={styles.emptyText}>No active listings.</p>
+          : <div style={styles.grid}>
+              {products.map(p => (
+                <a key={p.id} href={`/products/${p.id}`} style={styles.gridCard}>
+                  <img src={p.image_url} alt={p.title} style={styles.gridImg} />
+                  <p style={styles.gridTitle}>{p.title}</p>
+                  <p style={styles.gridPrice}>GH₵ {p.price}</p>
+                </a>
+              ))}
+            </div>
+        }
       </section>
 
       <div style={{ paddingBottom: 100 }} />
