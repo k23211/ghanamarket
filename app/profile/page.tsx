@@ -193,6 +193,16 @@ export default function AccountPage() {
     router.push('/auth');
   };
 
+  // Hide technical RLS messages from users and show a friendly message instead
+  const getDisplayError = (msg: string) => {
+    if (!msg) return '';
+    const s = msg.toLowerCase();
+    if (s.includes('row-level') || s.includes('row level') || s.includes('violates row')) {
+      return 'There was an issue saving your profile. Please refresh and try again.';
+    }
+    return msg;
+  };
+
   if (loading) return (
     <div style={styles.loadingContainer}>
       <div style={styles.spinner} />
@@ -229,7 +239,7 @@ export default function AccountPage() {
             <button onClick={handleAvatarClick} style={styles.avatarUploadBtn}>
               {avatarUploading ? 'Uploading…' : 'Change Photo'}
             </button>
-            {errorMessage && <span style={styles.avatarError}>{errorMessage}</span>}
+            {errorMessage && <span style={styles.avatarError}>{getDisplayError(errorMessage)}</span>}
             {statusMessage && <span style={styles.statusMessage}>{statusMessage}</span>}
           </div>
           <input
