@@ -13,6 +13,11 @@ export default function SellerDashboard() {
   const [showForm, setShowForm] = useState(false);
   const [uploading, setUploading] = useState(false);
   const [saving, setSaving] = useState(false);
+  const [editingProduct, setEditingProduct] = useState<any | null>(null);
+  const [editingUploading, setEditingUploading] = useState(false);
+  const [editingSaving, setEditingSaving] = useState(false);
+  const [editImageFile, setEditImageFile] = useState<File | null>(null);
+  const [editImagePreview, setEditImagePreview] = useState<string | null>(null);
   const [form, setForm] = useState({
     name: "", description: "", price: "", category: "Electronics", stock: "1",
   });
@@ -38,6 +43,13 @@ export default function SellerDashboard() {
     if (!file) return;
     setImageFile(file);
     setImagePreview(URL.createObjectURL(file));
+  };
+
+  const handleEditImage = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    setEditImageFile(file);
+    setEditImagePreview(URL.createObjectURL(file));
   };
 
   const handleSubmit = async () => {
@@ -75,6 +87,59 @@ export default function SellerDashboard() {
       setShowForm(false);
     }
     setSaving(false);
+  };
+
+  const handleEdit = (p: any) => {
+    setEditingProduct(p);
+    setForm({ name: p.name || '', description: p.description || '', price: String(p.price || ''), category: p.category || CATEGORIES[0], stock: String(p.stock || 1) });
+    setEditImagePreview(p.image_url || null);
+    setEditImageFile(null);
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  };
+
+  const handleCancelEdit = () => {
+    setEditingProduct(null);
+    setEditImageFile(null);
+    setEditImagePreview(null);
+    setForm({ name: '', description: '', price: '', category: 'Electronics', stock: '1' });
+  };
+
+  const handleUpdate = async () => {
+    if (!editingProduct) return;
+    if (!form.name || !form.price) return alert('Name and price are required');
+    setEditingSaving(true);
+    let image_url = editingProduct.image_url || null;
+
+    if (editImageFile) {
+      setEditingUploading(true);
+      const ext = editImageFile.name.split('.').pop();
+      const path = `${user.id}/${Date.now()}.${ext}`;
+      const { error: upErr } = await supabase.storage.from('products').upload(path, editImageFile, { upsert: true });
+      if (!upErr) {
+        const { data } = supabase.storage.from('products').getPublicUrl(path);
+        image_url = data?.publicUrl || data?.public_url || image_url;
+      }
+      setEditingUploading(false);
+    }
+
+    const { data, error } = await supabase.from('products').update({
+      name: form.name,
+      description: form.description,
+      price: Number(form.price),
+      category: form.category,
+      stock: Number(form.stock),
+      image_url,
+    }).eq('id', editingProduct.id).select().single();
+
+    if (!error && data) {
+      setMyProducts(prev => prev.map(p => p.id === data.id ? data : p));
+      handleCancelEdit();
+    } else if (error) {
+      console.error('Update error', error);
+      alert('Could not update product.');
+    }
+
+    setEditingSaving(false);
   };
 
   const handleDelete = async (id: string) => {
@@ -139,6 +204,73 @@ export default function SellerDashboard() {
           {showForm ? "✕ Cancel" : "+ Add New Product"}
         </button>
       </section>
+
+      {/* Edit Product Form (when editing) */}
+      {editingProduct && (
+        <section style={{ margin: "16px 16px 0", background: "#111", borderRadius: 16, padding: 16, border: "1px solid #1e1e1e" }}>
+          <h3 style={{ margin: "0 0 14px", fontSize: 14, fontWeight: 800 }}>Edit Product</h3>
+
+          <label style={{ display: "block", marginBottom: 12, cursor: "pointer" }}>
+            <div style={{ height: 140, background: "#1a1a1a", borderRadius: 12, border: "2px dashed #2a2a2a", display: "flex", alignItems: "center", justifyContent: "center", overflow: "hidden" }}>
+              {editImagePreview ? (
+                <img src={editImagePreview} style={{ width: "100%", height: "100%", objectFit: "cover" }} />
+              ) : (
+                <div style={{ textAlign: "center", color: "#555" }}>
+                  <div style={{ fontSize: 28 }}>📷</div>
+                  <div style={{ fontSize: 11, marginTop: 4 }}>Tap to replace photo</div>
+                </div>
+              )}
+            </div>
+            <input type="file" accept="image/*" onChange={handleEditImage} style={{ display: "none" }} />
+          </label>
+
+          {[{ key: "name", label: "Product Name", placeholder: "e.g. Wireless Headphones" }, { key: "price", label: "Price (GH₵)", placeholder: "e.g. 250", type: "number" }, { key: "stock", label: "Stock Quantity", placeholder: "e.g. 5", type: "number" }].map(f => (
+            <div key={f.key} style={{ marginBottom: 12 }}>
+              <label style={{ fontSize: 11, color: "#888", display: "block", marginBottom: 4 }}>{f.label}</label>
+              <input
+                type={f.type || "text"}
+                placeholder={f.placeholder}
+                value={(form as any)[f.key]}
+                onChange={e => setForm(prev => ({ ...prev, [f.key]: e.target.value }))}
+                style={{ width: "100%", background: "#1a1a1a", border: "1px solid #2a2a2a", borderRadius: 10, padding: "10px 12px", color: "#fff", fontSize: 13, boxSizing: "border-box" }}
+              />
+            </div>
+          ))}
+
+          <div style={{ marginBottom: 12 }}>
+            <label style={{ fontSize: 11, color: "#888", display: "block", marginBottom: 4 }}>Category</label>
+            <select
+              value={form.category}
+              onChange={e => setForm(prev => ({ ...prev, category: e.target.value }))}
+              style={{ width: "100%", background: "#1a1a1a", border: "1px solid #2a2a2a", borderRadius: 10, padding: "10px 12px", color: "#fff", fontSize: 13 }}
+            >
+              {CATEGORIES.map(c => <option key={c} value={c}>{c}</option>)}
+            </select>
+          </div>
+
+          <div style={{ marginBottom: 16 }}>
+            <label style={{ fontSize: 11, color: "#888", display: "block", marginBottom: 4 }}>Description</label>
+            <textarea
+              placeholder="Describe your product..."
+              value={form.description}
+              onChange={e => setForm(prev => ({ ...prev, description: e.target.value }))}
+              rows={3}
+              style={{ width: "100%", background: "#1a1a1a", border: "1px solid #2a2a2a", borderRadius: 10, padding: "10px 12px", color: "#fff", fontSize: 13, resize: "none", boxSizing: "border-box" }}
+            />
+          </div>
+
+          <div style={{ display: 'flex', gap: 10 }}>
+            <button
+              onClick={handleUpdate}
+              disabled={editingSaving}
+              style={{ flex: 1, background: editingSaving ? "#333" : "#f5a623", color: editingSaving ? "#666" : "#000", fontWeight: 800, fontSize: 14, padding: 14, borderRadius: 12, border: "none", cursor: editingSaving ? "not-allowed" : "pointer" }}
+            >
+              {editingUploading ? "Uploading image..." : editingSaving ? "Saving..." : "Save Changes"}
+            </button>
+            <button onClick={handleCancelEdit} style={{ flex: 1, background: '#222', color: '#fff', borderRadius: 12, border: '1px solid #2a2a2a', padding: 14 }}>Cancel</button>
+          </div>
+        </section>
+      )}
 
       {/* Add Product Form */}
       {showForm && (
@@ -236,12 +368,20 @@ export default function SellerDashboard() {
                   <p style={{ margin: "0 0 4px", fontSize: 15, fontWeight: 900, color: "#f5a623" }}>GH₵ {Number(p.price).toLocaleString()}</p>
                   <span style={{ background: "#1a2a0a", color: "#5d0", fontSize: 9, fontWeight: 700, padding: "2px 8px", borderRadius: 8 }}>Active</span>
                 </div>
-                <button
-                  onClick={() => handleDelete(p.id)}
-                  style={{ background: "#1a0a0a", border: "1px solid #2a1a1a", color: "#f55", fontSize: 11, padding: "6px 10px", borderRadius: 8, cursor: "pointer", flexShrink: 0 }}
-                >
-                  Delete
-                </button>
+                <div style={{ display: 'flex', flexDirection: 'column', gap: 8, flexShrink: 0 }}>
+                  <button
+                    onClick={() => handleEdit(p)}
+                    style={{ background: "#0a2a2a", border: "1px solid #153a3a", color: "#7ff", fontSize: 11, padding: "6px 10px", borderRadius: 8, cursor: "pointer" }}
+                  >
+                    Edit
+                  </button>
+                  <button
+                    onClick={() => handleDelete(p.id)}
+                    style={{ background: "#1a0a0a", border: "1px solid #2a1a1a", color: "#f55", fontSize: 11, padding: "6px 10px", borderRadius: 8, cursor: "pointer" }}
+                  >
+                    Delete
+                  </button>
+                </div>
               </div>
             ))}
           </div>
