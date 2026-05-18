@@ -108,14 +108,16 @@ export default function AccountPage() {
       return;
     }
 
-    const { error } = await supabase.from('profiles').update(form).eq('id', user.id);
+    // Use upsert to ensure the profile row is created/updated reliably
+    const upsertPayload = { id: user.id, ...form };
+    const { error } = await supabase.from('profiles').upsert(upsertPayload, { onConflict: 'id' });
     if (error) {
       console.error('Save error:', error.message);
-      setErrorMessage(error.message);
+      setErrorMessage(error.message || 'Unable to save profile.');
       return;
     }
 
-    setProfile(prev => prev ? { ...prev, ...form } : prev);
+    setProfile(prev => prev ? { ...prev, ...form } : ({ id: user.id, full_name: form.full_name, email: user.email, phone: form.phone, location: form.location, avatar_url: prev?.avatar_url || null, created_at: prev?.created_at || new Date().toISOString() } as Profile));
     setEditing(false);
     setStatusMessage('Profile saved successfully.');
   };
@@ -138,36 +140,45 @@ export default function AccountPage() {
     const fileName = `${user.id}-${Date.now()}.${extension || 'jpg'}`;
     const filePath = `avatars/${user.id}/${fileName}`;
 
-    const { error: uploadError } = await supabase.storage
+    // Upload file
+    const { data: uploadData, error: uploadError } = await supabase.storage
       .from('avatars')
       .upload(filePath, file, { upsert: true });
 
     if (uploadError) {
-      console.error('Upload error:', uploadError.message);
-      setErrorMessage('Upload failed. Please try again.');
+      console.error('Upload error:', uploadError.message, uploadError);
+      setErrorMessage(uploadError.message || 'Upload failed. Please try again.');
       setAvatarUploading(false);
       return;
     }
 
-    const { data: urlData } = supabase.storage
+    // Get public URL for the uploaded file
+    const { data: urlData, error: urlError } = supabase.storage
       .from('avatars')
       .getPublicUrl(filePath);
 
-    if (!urlData?.publicUrl) {
-      console.error('URL error');
+    if (urlError) {
+      console.error('GetPublicUrl error:', urlError.message, urlError);
       setErrorMessage('Could not get image URL.');
       setAvatarUploading(false);
       return;
     }
 
-    const publicUrl = urlData.publicUrl;
+    const publicUrl = urlData?.publicUrl || urlData?.public_url || null;
+    if (!publicUrl) {
+      console.error('URL error: missing public URL', urlData);
+      setErrorMessage('Could not get image URL.');
+      setAvatarUploading(false);
+      return;
+    }
+
+    // Persist avatar URL using upsert to guarantee row exists
     const { error: updateError } = await supabase
       .from('profiles')
-      .update({ avatar_url: publicUrl })
-      .eq('id', user.id);
+      .upsert({ id: user.id, avatar_url: publicUrl }, { onConflict: 'id' });
 
     if (updateError) {
-      console.error('Avatar save error:', updateError.message);
+      console.error('Avatar save error:', updateError.message, updateError);
       setErrorMessage('Could not save image to profile.');
       setAvatarUploading(false);
       return;
