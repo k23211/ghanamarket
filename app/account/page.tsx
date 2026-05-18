@@ -152,21 +152,14 @@ export default function AccountPage() {
       return;
     }
 
-    // Get public URL for the uploaded file
-    const { data: urlData, error: urlError } = supabase.storage
+    // Get public URL for the uploaded file (normalize shapes to satisfy TypeScript)
+    const urlResult: any = supabase.storage
       .from('avatars')
       .getPublicUrl(filePath);
 
-    if (urlError) {
-      console.error('GetPublicUrl error:', urlError.message, urlError);
-      setErrorMessage('Could not get image URL.');
-      setAvatarUploading(false);
-      return;
-    }
-
-    const publicUrl = urlData?.publicUrl || urlData?.public_url || null;
+    const publicUrl = urlResult?.data?.publicUrl || urlResult?.publicUrl || urlResult?.data?.public_url || null;
     if (!publicUrl) {
-      console.error('URL error: missing public URL', urlData);
+      console.error('GetPublicUrl error:', urlResult);
       setErrorMessage('Could not get image URL.');
       setAvatarUploading(false);
       return;
