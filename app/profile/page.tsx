@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState, ChangeEvent } from 'react';
 import { useRouter } from 'next/navigation';
 import { supabase } from '../../lib/supabase';
 import BottomNav from '../components/BottomNav';
@@ -30,6 +30,9 @@ export default function ProfilePage() {
   const [editing, setEditing] = useState(false);
   const [form, setForm] = useState({ full_name: '', phone: '', location: '' });
   const [loading, setLoading] = useState(true);
+  const [avatarUploading, setAvatarUploading] = useState(false);
+  const [avatarError, setAvatarError] = useState('');
+  const fileInputRef = useRef<HTMLInputElement | null>(null);
 
   useEffect(() => {
     const load = async () => {
@@ -76,6 +79,66 @@ export default function ProfilePage() {
     router.push('/auth');
   };
 
+  const handleAvatarSelect = async (event: ChangeEvent<HTMLInputElement>) => {
+    setAvatarError('');
+    const file = event.target.files?.[0];
+    if (!file) return;
+
+    setAvatarUploading(true);
+    const { data: { user } } = await supabase.auth.getUser();
+    if (!user) {
+      setAvatarError('Unable to find user. Please sign in again.');
+      setAvatarUploading(false);
+      return;
+    }
+
+    const extension = file.name.split('.').pop();
+    const fileName = `${user.id}-${Date.now()}.${extension || 'jpg'}`;
+    const filePath = `avatars/${user.id}/${fileName}`;
+
+    const { error: uploadError } = await supabase.storage
+      .from('avatars')
+      .upload(filePath, file, { upsert: true });
+
+    if (uploadError) {
+      console.error('Avatar upload error:', uploadError.message);
+      setAvatarError('Upload failed. Please try again.');
+      setAvatarUploading(false);
+      return;
+    }
+
+    const { data: urlData } = supabase.storage
+      .from('avatars')
+      .getPublicUrl(filePath);
+
+    if (!urlData?.publicUrl) {
+      console.error('Avatar URL error: no public URL returned');
+      setAvatarError('Could not get avatar URL.');
+      setAvatarUploading(false);
+      return;
+    }
+
+    const publicUrl = urlData.publicUrl;
+    const { error: updateError } = await supabase
+      .from('profiles')
+      .update({ avatar_url: publicUrl })
+      .eq('id', user.id);
+
+    if (updateError) {
+      console.error('Profile update error:', updateError.message);
+      setAvatarError('Could not save avatar.');
+      setAvatarUploading(false);
+      return;
+    }
+
+    setProfile(prev => prev ? { ...prev, avatar_url: publicUrl } : prev);
+    setAvatarUploading(false);
+  };
+
+  const handleAvatarClick = () => {
+    fileInputRef.current?.click();
+  };
+
   if (loading) return (
     <div style={styles.loadingContainer}>
       <div style={styles.spinner} />
@@ -108,6 +171,19 @@ export default function ProfilePage() {
           <p style={styles.memberSince}>
             Ghana · Member since {new Date(profile?.created_at || '').getFullYear()}
           </p>
+          <div style={styles.avatarActionRow}>
+            <button onClick={handleAvatarClick} style={styles.avatarUploadBtn}>
+              {avatarUploading ? 'Uploading…' : 'Change Photo'}
+            </button>
+            {avatarError && <span style={styles.avatarError}>{avatarError}</span>}
+          </div>
+          <input
+            ref={fileInputRef}
+            type="file"
+            accept="image/*"
+            style={{ display: 'none' }}
+            onChange={handleAvatarSelect}
+          />
         </div>
       </div>
 
@@ -218,6 +294,9 @@ const styles: Record<string, React.CSSProperties> = {
   infoValue: { color: '#fff', fontSize: 14 },
   input: { width: '100%', background: '#1a1a1a', border: '1px solid #333', borderRadius: 10, padding: '12px', color: '#fff', fontSize: 14, marginBottom: 10, boxSizing: 'border-box' },
   editBtn: { width: '100%', background: '#f5a623', border: 'none', borderRadius: 12, padding: '14px', color: '#000', fontWeight: 700, fontSize: 15, cursor: 'pointer', marginTop: 16 },
+  avatarActionRow: { display: 'flex', alignItems: 'center', gap: 10, marginTop: 10, flexWrap: 'wrap' },
+  avatarUploadBtn: { background: 'rgba(245,166,35,0.18)', border: '1px solid rgba(245,166,35,0.4)', color: '#f5a623', borderRadius: 12, padding: '10px 14px', cursor: 'pointer', fontSize: 13, fontWeight: 700 },
+  avatarError: { color: '#ff6b6b', fontSize: 12, marginTop: 4 },
   editBtnRow: { display: 'flex', gap: 10, marginTop: 8 },
   saveBtn: { flex: 1, background: '#f5a623', border: 'none', borderRadius: 10, padding: 12, color: '#000', fontWeight: 700, cursor: 'pointer' },
   cancelBtn: { flex: 1, background: '#222', border: 'none', borderRadius: 10, padding: 12, color: '#fff', cursor: 'pointer' },
