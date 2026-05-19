@@ -69,16 +69,19 @@ export default function SellerDashboard() {
         .eq("poster_id", user.id)
         .order("created_at", { ascending: false });
 
-      if ((!jobs || jobs.length === 0) && prof?.full_name) {
-        const fallback = await supabase
-          .from("jobs")
-          .select("*")
-          .eq("poster_name", prof.full_name)
-          .order("created_at", { ascending: false });
+      if ((!jobs || jobs.length === 0)) {
+        const fallbackNames = [prof?.full_name, user.email].filter(Boolean);
+        if (fallbackNames.length > 0) {
+          const fallback = await supabase
+            .from("jobs")
+            .select("*")
+            .in("poster_name", fallbackNames)
+            .order("created_at", { ascending: false });
 
-        if (!fallback.error && fallback.data && fallback.data.length > 0) {
-          jobs = fallback.data;
-          jobsError = null;
+          if (!fallback.error && fallback.data && fallback.data.length > 0) {
+            jobs = fallback.data;
+            jobsError = null;
+          }
         }
       }
 
