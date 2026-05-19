@@ -1,5 +1,6 @@
 "use client";
 import { useState, useEffect, useRef } from "react";
+import { useRouter } from "next/navigation";
 import { supabase } from "@/lib/supabase";
 import BottomNav from "@/app/components/BottomNav";
 import VisitorCount from "@/app/components/VisitorCount";
@@ -15,10 +16,13 @@ function Stars({ n = 5 }: { n?: number }) {
 
 // ── Main ──────────────────────────────────────────────────────────────────
 export default function HomePage() {
+  const router = useRouter();
   const [user, setUser] = useState<any>(null);
   const [profile, setProfile] = useState<any>(null);
   const [products, setProducts] = useState<any[]>([]);
   const [loadingProducts, setLoadingProducts] = useState(true);
+  const [jobSearch, setJobSearch] = useState('');
+  const [jobCategory, setJobCategory] = useState('All');
 
   useEffect(() => {
     const init = async () => {
@@ -148,12 +152,40 @@ export default function HomePage() {
             </div>
             <div style={{ display: "grid", gap: 12, marginTop: 20 }}>
               <div style={{ display: "grid", gridTemplateColumns: "1fr auto", gap: 10, background: "rgba(255,255,255,0.08)", borderRadius: 16, padding: "12px 14px", alignItems: "center" }}>
-                <input type="text" placeholder="Search jobs by title, company or keyword..." style={{ width: "100%", background: "transparent", border: "none", outline: "none", color: "#fff", fontSize: 13 }} />
-                <button style={{ background: "#f5a623", color: "#000", border: "none", borderRadius: 14, padding: "10px 16px", fontWeight: 700, cursor: "pointer" }}>Search</button>
+                <input
+                  value={jobSearch}
+                  onChange={e => setJobSearch(e.target.value)}
+                  type="text"
+                  placeholder="Search jobs by title, company or keyword..."
+                  style={{ width: "100%", background: "transparent", border: "none", outline: "none", color: "#fff", fontSize: 13 }}
+                />
+                <button
+                  type="button"
+                  onClick={() => router.push(`/jobs?search=${encodeURIComponent(jobSearch)}&type=${encodeURIComponent(jobCategory)}`)}
+                  style={{ background: "#f5a623", color: "#000", border: "none", borderRadius: 14, padding: "10px 16px", fontWeight: 700, cursor: "pointer" }}
+                >
+                  Search
+                </button>
               </div>
               <div style={{ display: "flex", flexWrap: "wrap", gap: 10 }}>
-                {["All Jobs", "IT & Tech", "Sales & Marketing", "Education", "Healthcare"].map(label => (
-                  <button key={label} style={{ background: "rgba(255,255,255,0.1)", border: "1px solid rgba(255,255,255,0.12)", borderRadius: 14, color: "#fff", fontSize: 12, padding: "10px 14px", cursor: "pointer" }}>
+                {["All", "Full-time", "Part-time", "Contract", "Internship"].map(label => (
+                  <button
+                    key={label}
+                    type="button"
+                    onClick={() => {
+                      setJobCategory(label)
+                      router.push(`/jobs?search=${encodeURIComponent(jobSearch)}&type=${encodeURIComponent(label)}`)
+                    }}
+                    style={{
+                      background: jobCategory === label ? "#f5a623" : "rgba(255,255,255,0.1)",
+                      border: "1px solid rgba(255,255,255,0.12)",
+                      borderRadius: 14,
+                      color: jobCategory === label ? "#000" : "#fff",
+                      fontSize: 12,
+                      padding: "10px 14px",
+                      cursor: "pointer"
+                    }}
+                  >
                     {label}
                   </button>
                 ))}

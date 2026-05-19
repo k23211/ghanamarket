@@ -1,6 +1,6 @@
 "use client"
 
-import { useMemo, useState } from "react"
+import { useEffect, useMemo, useState } from "react"
 import JobsList from "@/app/components/JobsList"
 import JobForm from "@/app/components/JobForm"
 import BottomNav from "@/app/components/BottomNav"
@@ -12,6 +12,14 @@ export default function JobsPage() {
   const [typeFilter, setTypeFilter] = useState('All')
   const [refresh, setRefresh] = useState(0)
   const jobCountText = useMemo(() => `${typeFilter === 'All' ? 'All jobs' : `${typeFilter} jobs`}`, [typeFilter])
+
+  useEffect(() => {
+    const params = new URLSearchParams(window.location.search)
+    const query = params.get('search') ?? ''
+    const type = params.get('type') ?? 'All'
+    setSearch(query)
+    setTypeFilter(type)
+  }, [])
 
   return (
     <main style={{ background: '#0d0d0d', color: '#fff', fontFamily: 'sans-serif', maxWidth: 480, margin: '0 auto', minHeight: '100vh' }}>
