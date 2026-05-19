@@ -262,12 +262,29 @@ export default function HomePage() {
         ) : (
           <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 12 }}>
             {products.map(product => (
-              <div key={product.id} style={{
-                background: "#111",
-                borderRadius: 14,
-                overflow: "hidden",
-                border: "1px solid #1e1e1e",
-              }}>
+              <a
+                key={product.id}
+                href={`/products/${product.id}`}
+                style={{
+                  background: "#111",
+                  borderRadius: 14,
+                  overflow: "hidden",
+                  border: "1px solid #1e1e1e",
+                  textDecoration: "none",
+                  color: "inherit",
+                  display: "block",
+                  cursor: "pointer",
+                  transition: "transform 0.2s, border-color 0.2s",
+                }}
+                onMouseEnter={(e) => {
+                  e.currentTarget.style.transform = "translateY(-4px)";
+                  e.currentTarget.style.borderColor = "#f5a623";
+                }}
+                onMouseLeave={(e) => {
+                  e.currentTarget.style.transform = "translateY(0)";
+                  e.currentTarget.style.borderColor = "#1e1e1e";
+                }}
+              >
                 <div style={{ height: 140, background: "#1a1a1a", position: "relative" }}>
                   {product.image_url ? (
                     <img
@@ -299,7 +316,7 @@ export default function HomePage() {
                   </p>
                   <Stars />
                 </div>
-              </div>
+              </a>
             ))}
           </div>
         )}
