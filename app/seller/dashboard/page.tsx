@@ -47,6 +47,7 @@ export default function SellerDashboard() {
 
   const [applications, setApplications] = useState<any[]>([]);
   const [applicationsLoading, setApplicationsLoading] = useState(false);
+  const [jobLoadError, setJobLoadError] = useState<string | null>(null);
 
   useEffect(() => {
     const init = async () => {
@@ -54,14 +55,34 @@ export default function SellerDashboard() {
       if (!user) { window.location.href = "/auth"; return; }
       setUser(user);
 
-      const [{ data: prof }, { data: prods }, { data: jobs }] = await Promise.all([
+      const [{ data: prof }, { data: prods }] = await Promise.all([
         supabase.from("profiles").select("*").eq("id", user.id).single(),
         supabase.from("products").select("*").eq("seller_id", user.id).order("created_at", { ascending: false }),
-        supabase.from("jobs").select("*").eq("poster_id", user.id).order("created_at", { ascending: false }),
       ]);
 
       setProfile(prof || null);
       setMyProducts(prods || []);
+
+      let { data: jobs, error: jobsError } = await supabase
+        .from("jobs")
+        .select("*")
+        .eq("poster_id", user.id)
+        .order("created_at", { ascending: false });
+
+      if ((!jobs || jobs.length === 0) && prof?.full_name) {
+        const fallback = await supabase
+          .from("jobs")
+          .select("*")
+          .eq("poster_name", prof.full_name)
+          .order("created_at", { ascending: false });
+
+        if (!fallback.error && fallback.data && fallback.data.length > 0) {
+          jobs = fallback.data;
+          jobsError = null;
+        }
+      }
+
+      setJobLoadError(jobsError?.message || null);
       setMyJobs(jobs || []);
       await loadApplications(jobs || []);
       setLoading(false);
