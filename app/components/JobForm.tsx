@@ -20,9 +20,13 @@ export default function JobForm({ onPosted }: { onPosted?: () => void }) {
 
     // try to get logged-in user's name
     let poster_name: string | null = null
+    let poster_id: string | null = null
     try {
       const { data: { user } } = await supabase.auth.getUser()
-      if (user) poster_name = (user.user_metadata?.full_name as string) || (user.email as string)
+      if (user) {
+        poster_name = (user.user_metadata?.full_name as string) || (user.email as string)
+        poster_id = user.id
+      }
     } catch (e) {
       // ignore
     }
@@ -31,7 +35,7 @@ export default function JobForm({ onPosted }: { onPosted?: () => void }) {
       const res = await fetch('/api/jobs', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ title, company, location, type, description, poster_name })
+        body: JSON.stringify({ title, company, location, type, description, poster_name, poster_id })
       })
       const json = await res.json()
       if (json.job) {
