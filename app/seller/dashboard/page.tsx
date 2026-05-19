@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 import { useEffect, useState } from "react";
 import { supabase } from "@/lib/supabase";
 import BottomNav from "@/app/components/BottomNav";
@@ -51,11 +51,7 @@ export default function SellerDashboard() {
   useEffect(() => {
     const init = async () => {
       const { data: { user } } = await supabase.auth.getUser();
-      if (!user) {
-        window.location.href = "/auth";
-        return;
-      }
-
+      if (!user) { window.location.href = "/auth"; return; }
       setUser(user);
 
       const [{ data: prof }, { data: prods }, { data: jobs }] = await Promise.all([
@@ -70,7 +66,6 @@ export default function SellerDashboard() {
       await loadApplications(jobs || []);
       setLoading(false);
     };
-
     init();
   }, []);
 
@@ -145,7 +140,7 @@ export default function SellerDashboard() {
     }).select().single();
 
     if (!error && data) {
-      setMyProducts((prev) => [data, ...prev]);
+      setMyProducts(prev => [data, ...prev]);
       resetProductForm();
       setShowProductForm(false);
     }
@@ -155,16 +150,16 @@ export default function SellerDashboard() {
   const handleEditProduct = (product: any) => {
     setEditingProduct(product);
     setProductForm({
-      name: product.name || "",
-      description: product.description || "",
-      price: String(product.price || ""),
+      name: product.name || '',
+      description: product.description || '',
+      price: String(product.price || ''),
       category: product.category || PRODUCT_CATEGORIES[0],
       stock: String(product.stock || 1),
     });
     setEditImagePreview(product.image_url || null);
     setEditImageFile(null);
     setShowProductForm(false);
-    window.scrollTo({ top: 0, behavior: "smooth" });
+    window.scrollTo({ top: 0, behavior: 'smooth' });
   };
 
   const handleCancelProductEdit = () => {
@@ -176,7 +171,7 @@ export default function SellerDashboard() {
 
   const handleUpdateProduct = async () => {
     if (!editingProduct) return;
-    if (!productForm.name || !productForm.price) return alert("Name and price are required");
+    if (!productForm.name || !productForm.price) return alert('Name and price are required');
     setEditingSaving(true);
     let image_url = editingProduct.image_url || null;
 
@@ -184,43 +179,43 @@ export default function SellerDashboard() {
       setEditingUploading(true);
       const ext = editImageFile.name.split('.').pop();
       const path = `${user.id}/${Date.now()}.${ext}`;
-      const { error: upErr } = await supabase.storage.from("products").upload(path, editImageFile, { upsert: true });
+      const { error: upErr } = await supabase.storage.from('products').upload(path, editImageFile, { upsert: true });
       if (!upErr) {
-        const { data } = supabase.storage.from("products").getPublicUrl(path);
+        const { data } = supabase.storage.from('products').getPublicUrl(path);
         image_url = data?.publicUrl || image_url;
       }
       setEditingUploading(false);
     }
 
-    const { data, error } = await supabase.from("products").update({
+    const { data, error } = await supabase.from('products').update({
       name: productForm.name,
       description: productForm.description,
       price: Number(productForm.price),
       category: productForm.category,
       stock: Number(productForm.stock),
       image_url,
-    }).eq("id", editingProduct.id).select().single();
+    }).eq('id', editingProduct.id).select().single();
 
     if (!error && data) {
-      setMyProducts((prev) => prev.map((p) => (p.id === data.id ? data : p)));
+      setMyProducts(prev => prev.map(p => p.id === data.id ? data : p));
       handleCancelProductEdit();
     } else {
-      alert("Could not update product.");
+      alert('Could not update product.');
     }
     setEditingSaving(false);
   };
 
   const handleDeleteProduct = async (id: string) => {
-    if (!confirm("Delete this product?")) return;
-    await supabase.from("products").delete().eq("id", id);
-    setMyProducts((prev) => prev.filter((p) => p.id !== id));
+    if (!confirm('Delete this product?')) return;
+    await supabase.from('products').delete().eq('id', id);
+    setMyProducts(prev => prev.filter(p => p.id !== id));
   };
 
   const handleAddJob = async () => {
-    if (!jobForm.title || !jobForm.company) return alert("Job title and company are required");
+    if (!jobForm.title || !jobForm.company) return alert('Job title and company are required');
     setJobSaving(true);
 
-    const { data, error } = await supabase.from("jobs").insert({
+    const { data, error } = await supabase.from('jobs').insert({
       poster_id: user.id,
       poster_name: profile?.full_name || user.email || null,
       title: jobForm.title,
@@ -244,14 +239,14 @@ export default function SellerDashboard() {
   const handleEditJob = (job: any) => {
     setEditingJob(job);
     setJobForm({
-      title: job.title || "",
-      company: job.company || "",
-      location: job.location || "",
-      type: job.type || "Full-time",
-      description: job.description || "",
+      title: job.title || '',
+      company: job.company || '',
+      location: job.location || '',
+      type: job.type || 'Full-time',
+      description: job.description || '',
     });
     setShowJobForm(true);
-    window.scrollTo({ top: 0, behavior: "smooth" });
+    window.scrollTo({ top: 0, behavior: 'smooth' });
   };
 
   const handleCancelJobEdit = () => {
@@ -261,48 +256,47 @@ export default function SellerDashboard() {
 
   const handleUpdateJob = async () => {
     if (!editingJob) return;
-    if (!jobForm.title || !jobForm.company) return alert("Job title and company are required");
+    if (!jobForm.title || !jobForm.company) return alert('Job title and company are required');
     setJobUpdating(true);
 
-    const { data, error } = await supabase.from("jobs").update({
+    const { data, error } = await supabase.from('jobs').update({
       title: jobForm.title,
       company: jobForm.company,
       location: jobForm.location || null,
       type: jobForm.type || null,
       description: jobForm.description || null,
-    }).eq("id", editingJob.id).select().single();
+    }).eq('id', editingJob.id).select().single();
 
     if (!error && data) {
-      const updatedJobs = myJobs.map((job) => (job.id === data.id ? data : job));
+      const updatedJobs = myJobs.map((job) => job.id === data.id ? data : job);
       setMyJobs(updatedJobs);
       await loadApplications(updatedJobs);
       handleCancelJobEdit();
     } else {
-      alert("Could not update job.");
+      alert('Could not update job.');
     }
     setJobUpdating(false);
   };
 
   const handleDeleteJob = async (id: string) => {
-    if (!confirm("Delete this job?")) return;
-    await supabase.from("jobs").delete().eq("id", id);
-    setMyJobs((prev) => prev.filter((job) => job.id !== id));
-    setApplications((prev) => prev.filter((app) => app.job_id !== id));
+    if (!confirm('Delete this job?')) return;
+    await supabase.from('jobs').delete().eq('id', id);
+    setMyJobs(prev => prev.filter((job) => job.id !== id));
+    setApplications(prev => prev.filter((app) => app.job_id !== id));
   };
 
-  if (loading) {
-    return (
-      <div style={{ background: "#0d0d0d", minHeight: "100vh", display: "flex", alignItems: "center", justifyContent: "center", color: "#f5a623", fontWeight: 700, fontSize: 16 }}>
-        Loading...
-      </div>
-    );
-  }
+  if (loading) return (
+    <div style={{ background: "#0d0d0d", minHeight: "100vh", display: "flex", alignItems: "center", justifyContent: "center", color: "#f5a623", fontWeight: 700, fontSize: 16 }}>
+      Loading...
+    </div>
+  );
 
   const sellerPhone = profile?.phone ? String(profile.phone).replace(/[^0-9]/g, "") : null;
   const whatsappLink = sellerPhone ? `https://wa.me/${sellerPhone}?text=${encodeURIComponent("Hello, I want to manage my listings on GhanaMarket.")}` : null;
 
   return (
     <main style={{ backgroundColor: "#0d0d0d", color: "#fff", fontFamily: "'Segoe UI', sans-serif", maxWidth: 480, margin: "0 auto", minHeight: "100vh" }}>
+
       <header style={{ background: "#111", padding: "14px 16px", display: "flex", alignItems: "center", justifyContent: "space-between", borderBottom: "1px solid #1a1a1a", position: "sticky", top: 0, zIndex: 40 }}>
         <div>
           <div style={{ fontWeight: 900, fontSize: 18 }}>
