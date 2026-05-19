@@ -1,5 +1,5 @@
 "use client";
-import { useState, useEffect, useRef } from "react";
+import { useEffect, useState } from "react";
 import { useParams, useSearchParams } from "next/navigation";
 import { supabase } from "@/lib/supabase";
 
@@ -8,26 +8,29 @@ export default function ChatPage() {
   const searchParams = useSearchParams();
   const productId = searchParams.get("product");
 
-  const [messages, setMessages] = useState<any[]>([]);
-  const [newMessage, setNewMessage] = useState("");
-  const [currentUser, setCurrentUser] = useState<any>(null);
   const [seller, setSeller] = useState<any>(null);
   const [product, setProduct] = useState<any>(null);
   const [loading, setLoading] = useState(true);
-  const bottomRef = useRef<HTMLDivElement>(null);
+  const [whatsappUrl, setWhatsappUrl] = useState<string | null>(null);
+  const [error, setError] = useState<string | null>(null);
 
-  // Fetch current user, seller info, and product info
   useEffect(() => {
     const init = async () => {
       const { data: { user } } = await supabase.auth.getUser();
       if (!user) { window.location.href = "/auth"; return; }
-      setCurrentUser(user);
 
-      const { data: sellerData } = await supabase
+      const { data: sellerData, error: sellerError } = await supabase
         .from("profiles")
         .select("*")
         .eq("id", sellerId)
         .single();
+
+      if (sellerError || !sellerData) {
+        setError("Seller not found");
+        setLoading(false);
+        return;
+      }
+
       setSeller(sellerData);
 
       if (productId) {
@@ -44,69 +47,30 @@ export default function ChatPage() {
     init();
   }, [sellerId, productId]);
 
-  // Fetch messages and subscribe to realtime
   useEffect(() => {
-    if (!currentUser) return;
-
-    const fetchMessages = async () => {
-      const { data } = await supabase
-        .from("messages")
-        .select("*")
-        .or(
-          `and(sender_id.eq.${currentUser.id},receiver_id.eq.${sellerId}),and(sender_id.eq.${sellerId},receiver_id.eq.${currentUser.id})`
-        )
-        .order("created_at", { ascending: true });
-      setMessages(data || []);
-    };
-
-    fetchMessages();
-
-    // Realtime subscription
-    const channel = supabase
-      .channel(`chat-${currentUser.id}-${sellerId}`)
-      .on(
-        "postgres_changes",
-        {
-          event: "INSERT",
-          schema: "public",
-          table: "messages",
-          filter: `receiver_id=eq.${currentUser.id}`,
-        },
-        (payload) => {
-          setMessages((prev) => [...prev, payload.new]);
-        }
-      )
-      .subscribe();
-
-    return () => { supabase.removeChannel(channel); };
-  }, [currentUser, sellerId]);
-
-  // Auto-scroll to bottom on new messages
-  useEffect(() => {
-    bottomRef.current?.scrollIntoView({ behavior: "smooth" });
-  }, [messages]);
-
-  const sendMessage = async () => {
-    const text = newMessage.trim();
-    if (!text || !currentUser) return;
-
-    setNewMessage("");
-
-    const { data, error } = await supabase.from("messages").insert({
-      sender_id: currentUser.id,
-      receiver_id: sellerId,
-      product_id: productId || null,
-      content: text,
-    }).select().single();
-
-    if (!error && data) {
-      setMessages((prev) => [...prev, data]);
+    if (!seller) return;
+    if (!seller.phone) {
+      setError("Seller has no WhatsApp number available.");
+      return;
     }
-  };
+
+    const cleanPhone = String(seller.phone).replace(/[^0-9]/g, "");
+    const text = product
+      ? `Hello, I am interested in your product \"${product.name}\".`
+      : `Hello, I would like to contact you about your listing.`;
+
+    setWhatsappUrl(`https://wa.me/${cleanPhone}?text=${encodeURIComponent(text)}`);
+  }, [seller, product]);
+
+  useEffect(() => {
+    if (whatsappUrl) {
+      window.location.href = whatsappUrl;
+    }
+  }, [whatsappUrl]);
 
   if (loading) return (
     <div style={{ background: "#0d0d0d", minHeight: "100vh", display: "flex", alignItems: "center", justifyContent: "center", color: "#f5a623", fontWeight: 700 }}>
-      Loading...
+      Loading WhatsApp...
     </div>
   );
 
@@ -121,8 +85,6 @@ export default function ChatPage() {
       display: "flex",
       flexDirection: "column",
     }}>
-
-      {/* Header */}
       <header style={{
         background: "#111",
         padding: "14px 16px",
@@ -145,136 +107,22 @@ export default function ChatPage() {
         </div>
         <div style={{ flex: 1 }}>
           <p style={{ margin: 0, fontWeight: 700, fontSize: 15 }}>{seller?.full_name || "Seller"}</p>
-          <p style={{ margin: 0, fontSize: 11, color: "#555" }}>Tap to view profile</p>
+          <p style={{ margin: 0, fontSize: 11, color: "#555" }}>Opening WhatsApp...</p>
         </div>
         <a href={`/profile/${sellerId}`} style={{ color: "#f5a623", fontSize: 11, fontWeight: 700, textDecoration: "none" }}>
           Profile →
         </a>
       </header>
-
-      {/* Product context banner */}
-      {product && (
-        <div style={{
-          background: "#111",
-          borderBottom: "1px solid #1a1a1a",
-          padding: "10px 16px",
-          display: "flex",
-          alignItems: "center",
-          gap: 10,
-        }}>
-          {product.image_url && (
-            <img src={product.image_url} alt={product.name} style={{ width: 40, height: 40, borderRadius: 8, objectFit: "cover" }} />
-          )}
-          <div style={{ flex: 1 }}>
-            <p style={{ margin: 0, fontSize: 12, color: "#aaa" }}>Enquiring about</p>
-            <p style={{ margin: 0, fontSize: 13, fontWeight: 700 }}>{product.name}</p>
-          </div>
-          <p style={{ margin: 0, fontSize: 13, fontWeight: 900, color: "#f5a623" }}>
-            GH₵ {Number(product.price).toLocaleString()}
-          </p>
-        </div>
-      )}
-
-      {/* Messages */}
-      <div style={{
-        flex: 1,
-        overflowY: "auto",
-        padding: "16px",
-        display: "flex",
-        flexDirection: "column",
-        gap: 10,
-        paddingBottom: 90,
-      }}>
-        {messages.length === 0 && (
-          <div style={{ textAlign: "center", color: "#333", fontSize: 13, marginTop: 60 }}>
-            No messages yet. Say hello! 👋
-          </div>
+      <div style={{ padding: 24, textAlign: "center", flex: 1, display: "flex", alignItems: "center", justifyContent: "center", flexDirection: "column" }}>
+        <p style={{ color: "#aaa", fontSize: 14, lineHeight: 1.6 }}>
+          You are being redirected to WhatsApp to contact the seller.
+        </p>
+        {error && <p style={{ color: "#ff6b6b", marginTop: 16 }}>{error}</p>}
+        {whatsappUrl && (
+          <a href={whatsappUrl} target="_blank" rel="noreferrer" style={{ marginTop: 24, background: "#25D366", color: "#000", padding: "14px 18px", borderRadius: 14, textDecoration: "none", fontWeight: 700 }}>
+            Open WhatsApp
+          </a>
         )}
-
-        {messages.map((msg) => {
-          const isMine = msg.sender_id === currentUser?.id;
-          return (
-            <div key={msg.id} style={{
-              display: "flex",
-              justifyContent: isMine ? "flex-end" : "flex-start",
-            }}>
-              <div style={{
-                maxWidth: "75%",
-                background: isMine ? "#f5a623" : "#1a1a1a",
-                color: isMine ? "#000" : "#fff",
-                borderRadius: isMine ? "18px 18px 4px 18px" : "18px 18px 18px 4px",
-                padding: "10px 14px",
-                fontSize: 14,
-                lineHeight: 1.5,
-                border: isMine ? "none" : "1px solid #2a2a2a",
-              }}>
-                <p style={{ margin: 0 }}>{msg.content}</p>
-                <p style={{
-                  margin: "4px 0 0",
-                  fontSize: 10,
-                  color: isMine ? "rgba(0,0,0,0.5)" : "#444",
-                  textAlign: "right",
-                }}>
-                  {new Date(msg.created_at).toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })}
-                </p>
-              </div>
-            </div>
-          );
-        })}
-        <div ref={bottomRef} />
-      </div>
-
-      {/* Input bar */}
-      <div style={{
-        position: "fixed",
-        bottom: 0,
-        left: "50%",
-        transform: "translateX(-50%)",
-        width: "100%",
-        maxWidth: 480,
-        background: "#111",
-        borderTop: "1px solid #1a1a1a",
-        padding: "12px 16px",
-        display: "flex",
-        gap: 10,
-        boxSizing: "border-box",
-        zIndex: 40,
-      }}>
-        <input
-          type="text"
-          placeholder="Type a message..."
-          value={newMessage}
-          onChange={e => setNewMessage(e.target.value)}
-          onKeyDown={e => e.key === "Enter" && sendMessage()}
-          style={{
-            flex: 1,
-            background: "#1a1a1a",
-            border: "1px solid #2a2a2a",
-            borderRadius: 24,
-            padding: "11px 16px",
-            color: "#fff",
-            fontSize: 14,
-            outline: "none",
-          }}
-        />
-        <button
-          onClick={sendMessage}
-          style={{
-            background: "#f5a623",
-            border: "none",
-            borderRadius: "50%",
-            width: 44,
-            height: 44,
-            fontSize: 18,
-            cursor: "pointer",
-            flexShrink: 0,
-            display: "flex",
-            alignItems: "center",
-            justifyContent: "center",
-          }}
-        >
-          ➤
-        </button>
       </div>
     </main>
   );

@@ -195,6 +195,7 @@ export default function ProductDetailPage() {
           padding: "12px 16px",
           background: "linear-gradient(to top, #0d0d0d 80%, transparent)",
           display: "flex",
+          gap: 10,
           boxSizing: "border-box",
           zIndex: 30,
         }}>
@@ -213,6 +214,26 @@ export default function ProductDetailPage() {
             }}
           >
             📞 Call Seller
+          </a>
+          <a
+            href={`https://wa.me/${String(seller.phone).replace(/[^0-9]/g, "")}?text=${encodeURIComponent(
+              `Hello, I am interested in your product "${product?.name || "your listing"}".`
+            )}`}
+            target="_blank"
+            rel="noreferrer"
+            style={{
+              flex: 1,
+              background: "#25D366",
+              color: "#000",
+              fontWeight: 800,
+              fontSize: 14,
+              padding: "14px",
+              borderRadius: 14,
+              textAlign: "center",
+              textDecoration: "none",
+            }}
+          >
+            💬 WhatsApp
           </a>
         </div>
       )}
