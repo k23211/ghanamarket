@@ -8,6 +8,7 @@ export default function ProductDetailPage() {
   const { id } = useParams();
   const [product, setProduct] = useState<any>(null);
   const [seller, setSeller] = useState<any>(null);
+  const [user, setUser] = useState<any>(null);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
@@ -17,6 +18,9 @@ export default function ProductDetailPage() {
         .select("*")
         .eq("id", id)
         .single();
+
+      const { data: userData } = await supabase.auth.getUser();
+      setUser(userData.user || null);
 
       if (prod) {
         setProduct(prod);
@@ -184,7 +188,7 @@ export default function ProductDetailPage() {
       </section>
 
       {/* Action Buttons */}
-      {seller?.phone && (
+      {seller?.phone && user?.id !== product?.seller_id && (
         <div style={{
           position: "fixed",
           bottom: 70,
