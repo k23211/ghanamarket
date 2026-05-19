@@ -212,17 +212,33 @@ export default function HomePage() {
         </div>
       </section>
 
-      <section style={{ padding: "20px 16px", marginTop: 14 }}>
-        <div style={{ display: 'flex', flexDirection: 'column', gap: 18, background: 'linear-gradient(180deg, #151212 0%, #0d0d0d 100%)', border: '1px solid rgba(245,166,35,0.2)', borderRadius: 24, padding: 20, boxShadow: '0 20px 45px rgba(0,0,0,0.17)' }}>
-          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', gap: 12, flexWrap: 'wrap' }}>
-            <div>
-              <p style={{ margin: 0, fontSize: 16, fontWeight: 900, color: '#fff' }}>Visitor Stats</p>
-              <p style={{ margin: '6px 0 0', fontSize: 12, color: '#ccc' }}>See total, daily, and monthly visits at a glance.</p>
+      <section style={{ padding: "16px 16px", marginTop: 12 }}>
+        <div style={{ display: 'flex', justifyContent: 'center' }}>
+          <div style={{ width: 320, maxWidth: '100%', display: 'flex', alignItems: 'center', gap: 12, background: 'linear-gradient(90deg, rgba(245,166,35,0.06), rgba(13,13,13,0.6))', border: '1px solid rgba(245,166,35,0.12)', borderRadius: 16, padding: 12, boxShadow: '0 8px 24px rgba(0,0,0,0.3)' }}>
+            <div style={{ width: 68, height: 68, borderRadius: 12, background: 'linear-gradient(180deg,#f5a623,#d88b1a)', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#000', fontWeight: 900, fontSize: 18 }}>
+              👀
             </div>
-            <div style={{ color: '#f5a623', fontSize: 11, fontWeight: 700 }}>Live updates on each page load</div>
-          </div>
-          <div style={{ display: 'flex', justifyContent: 'center', padding: 16, background: '#0b0b0b', borderRadius: 20, border: '1px solid rgba(255,255,255,0.04)' }}>
-            <VisitorCount />
+            <div style={{ flex: 1, minWidth: 0 }}>
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'baseline', gap: 8 }}>
+                <div>
+                  <div style={{ fontSize: 13, fontWeight: 800, color: '#fff' }}>Visitor Stats</div>
+                  <div style={{ fontSize: 11, color: '#bbb', marginTop: 2 }}>Live • updated on page load</div>
+                </div>
+                <div style={{ textAlign: 'right' }}>
+                  <div style={{ fontSize: 18, fontWeight: 900, color: '#f5a623' }}>—</div>
+                </div>
+              </div>
+              <div style={{ marginTop: 8, display: 'flex', gap: 8, alignItems: 'center' }}>
+                <div style={{ flex: 1, background: 'rgba(255,255,255,0.03)', borderRadius: 10, padding: '8px 10px', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                  <div style={{ fontSize: 12, color: '#aaa' }}>Total</div>
+                  <div style={{ fontSize: 14, fontWeight: 900, color: '#fff' }}><VisitorCount compact /></div>
+                </div>
+                <div style={{ width: 86, background: 'rgba(255,255,255,0.03)', borderRadius: 10, padding: '8px 10px', textAlign: 'center' }}>
+                  <div style={{ fontSize: 11, color: '#aaa' }}>Today</div>
+                  <div style={{ fontSize: 13, fontWeight: 800, color: '#fff' }}>—</div>
+                </div>
+              </div>
+            </div>
           </div>
         </div>
       </section>

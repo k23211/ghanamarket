@@ -8,7 +8,7 @@ type VisitorStats = {
   monthCount: number
 }
 
-export default function VisitorCount() {
+export default function VisitorCount({ compact }: { compact?: boolean }) {
   const [stats, setStats] = useState<VisitorStats | null>(null)
 
   useEffect(() => {
@@ -31,6 +31,15 @@ export default function VisitorCount() {
     inc()
     return () => { mounted = false }
   }, [])
+
+  if (compact) {
+    return (
+      <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+        <div style={{ fontSize: 22, fontWeight: 900, color: '#f5a623', lineHeight: 1 }}>{stats?.count == null ? '—' : stats.count}</div>
+        <div style={{ fontSize: 11, color: '#bbb' }}>visitors</div>
+      </div>
+    )
+  }
 
   return (
     <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', width: '100%' }}>
