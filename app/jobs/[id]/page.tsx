@@ -2,8 +2,8 @@
 
 import { useEffect, useState } from 'react'
 import { useParams, useRouter } from 'next/navigation'
+import { supabase } from '@/lib/supabase'
 import BottomNav from '@/app/components/BottomNav'
-import ApplicationForm from '@/app/components/ApplicationForm'
 
 export default function JobDetailPage() {
   const params = useParams()
@@ -14,6 +14,8 @@ export default function JobDetailPage() {
   const [error, setError] = useState('')
   const [applicationsCount, setApplicationsCount] = useState<number | null>(null)
   const [refreshApplications, setRefreshApplications] = useState(0)
+  const [posterPhone, setPosterPhone] = useState<string | null>(null)
+  const [whatsappUrl, setWhatsappUrl] = useState<string | null>(null)
 
   useEffect(() => {
     if (!id) return
@@ -60,6 +62,32 @@ export default function JobDetailPage() {
     return () => { mounted = false }
   }, [id, refreshApplications])
 
+  useEffect(() => {
+    if (!job?.poster_id) return
+    let mounted = true
+
+    const loadPosterPhone = async () => {
+      const { data, error } = await supabase
+        .from('profiles')
+        .select('phone')
+        .eq('id', job.poster_id)
+        .single()
+      if (!mounted) return
+      if (!error && data?.phone) {
+        setPosterPhone(String(data.phone).replace(/[^0-9]/g, ''))
+      }
+    }
+
+    loadPosterPhone()
+    return () => { mounted = false }
+  }, [job])
+
+  useEffect(() => {
+    if (!posterPhone || !job) return
+    const text = `Hello, I saw your job on GhanaMarket and I would like to apply for the ${job.title} role.`
+    setWhatsappUrl(`https://wa.me/${posterPhone}?text=${encodeURIComponent(text)}`)
+  }, [posterPhone, job])
+
   return (
     <main style={{ background: '#0d0d0d', color: '#fff', fontFamily: 'sans-serif', maxWidth: 480, margin: '0 auto', minHeight: '100vh' }}>
       <section style={{ background: '#111', padding: 16, borderBottom: '1px solid #1a1a1a' }}>
@@ -104,7 +132,31 @@ export default function JobDetailPage() {
               <p style={{ margin: '0 0 16px', color: '#aaa', fontSize: 13 }}>
                 {applicationsCount === null ? 'Loading application count…' : `${applicationsCount} application${applicationsCount === 1 ? '' : 's'} submitted`}
               </p>
-              <ApplicationForm jobId={id!} onApplied={() => setRefreshApplications(prev => prev + 1)} />
+              {whatsappUrl ? (
+                <a
+                  href={whatsappUrl}
+                  target="_blank"
+                  rel="noreferrer"
+                  style={{
+                    display: 'inline-block',
+                    width: '100%',
+                    background: '#25D366',
+                    color: '#000',
+                    fontWeight: 800,
+                    fontSize: 14,
+                    padding: '14px',
+                    borderRadius: 14,
+                    textAlign: 'center',
+                    textDecoration: 'none',
+                  }}
+                >
+                  💬 Apply via WhatsApp
+                </a>
+              ) : (
+                <div style={{ color: '#888', fontSize: 13 }}>
+                  The job poster has not shared a WhatsApp number yet.
+                </div>
+              )}
             </div>
           </div>
         ) : null}
