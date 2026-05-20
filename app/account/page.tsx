@@ -321,7 +321,7 @@ export default function AccountPage() {
       <section style={styles.listingsSection}>
         <div style={styles.listingsHeader}>
           <h3 style={styles.listingsTitle}>My Listings</h3>
-          <a href="/products/manage" style={styles.manageLink}>Manage →</a>
+          <a href="/seller/dashboard" style={styles.manageLink}>Manage →</a>
         </div>
         {products.length === 0 ? (
           <p style={styles.emptyText}>No listings yet.</p>
