@@ -1,6 +1,9 @@
-import React from "react";
+"use client";
+
+import React, { useEffect } from "react";
 import type { Metadata } from "next";
 import "./globals.css";
+import { trackUniqueVisit } from "../utils/trackVisitor";
 
 export const metadata: Metadata = {
   title: "GhanaMarket",
@@ -12,6 +15,9 @@ export default function RootLayout({
 }: Readonly<{
   children: React.ReactNode;
 }>) {
+  useEffect(() => {
+    void trackUniqueVisit();
+  }, []);
   return (
     <html lang="en">
       <body>{children}</body>

@@ -1,6 +1,5 @@
 "use client";
-import { useState, useEffect, useRef } from "react";
-import { useRouter } from "next/navigation";
+import { useState, useEffect } from "react";
 import { supabase } from "@/lib/supabase";
 import BottomNav from "@/app/components/BottomNav";
 import VisitorCount from "@/app/components/VisitorCount";
@@ -16,13 +15,10 @@ function Stars({ n = 5 }: { n?: number }) {
 
 // ── Main ──────────────────────────────────────────────────────────────────
 export default function HomePage() {
-  const router = useRouter();
   const [user, setUser] = useState<any>(null);
   const [profile, setProfile] = useState<any>(null);
   const [products, setProducts] = useState<any[]>([]);
   const [loadingProducts, setLoadingProducts] = useState(true);
-  const [jobSearch, setJobSearch] = useState('');
-  const [jobCategory, setJobCategory] = useState('All');
 
   useEffect(() => {
     const init = async () => {
@@ -128,72 +124,7 @@ export default function HomePage() {
         </div>
       </section>
 
-      {/* ── Job Section ── */}
-      <section style={{ marginTop: 16, padding: "0 16px" }}>
-        <div style={{
-          position: "relative",
-          overflow: "hidden",
-          borderRadius: 24,
-          minHeight: 260,
-          backgroundImage: "url('/job.png')",
-          backgroundSize: "cover",
-          backgroundPosition: "center",
-          border: "1px solid rgba(255,255,255,0.08)",
-        }}>
-          <div style={{ position: "absolute", inset: 0, background: "linear-gradient(180deg, rgba(0,0,0,0.3) 0%, rgba(0,0,0,0.75) 100%)" }} />
-          <div style={{ position: "relative", zIndex: 2, padding: 24, display: "flex", flexDirection: "column", justifyContent: "space-between", height: "100%" }}>
-            <div>
-              <div style={{ display: "inline-flex", alignItems: "center", gap: 6, marginBottom: 12, color: "#f5a623", fontSize: 12, fontWeight: 700 }}>
-                <span style={{ width: 22, height: 22, borderRadius: 999, background: "rgba(245,166,35,0.2)", display: "inline-flex", alignItems: "center", justifyContent: "center" }}>💼</span>
-                Jobs for Everyone
-              </div>
-              <h2 style={{ margin: 0, fontSize: 22, fontWeight: 900, color: "#fff", lineHeight: 1.1 }}>Find your next opportunity with GhanaMarket Jobs</h2>
-              <p style={{ margin: "12px 0 0", color: "#ddd", fontSize: 13, maxWidth: 380 }}>Explore verified roles across Ghana, from field work to tech, healthcare, and more.</p>
-            </div>
-            <div style={{ display: "grid", gap: 12, marginTop: 20 }}>
-              <div style={{ display: "grid", gridTemplateColumns: "1fr auto", gap: 10, background: "rgba(255,255,255,0.08)", borderRadius: 16, padding: "12px 14px", alignItems: "center" }}>
-                <input
-                  value={jobSearch}
-                  onChange={e => setJobSearch(e.target.value)}
-                  type="text"
-                  placeholder="Search jobs by title, company or keyword..."
-                  style={{ width: "100%", background: "transparent", border: "none", outline: "none", color: "#fff", fontSize: 13 }}
-                />
-                <button
-                  type="button"
-                  onClick={() => router.push(`/jobs?search=${encodeURIComponent(jobSearch)}&type=${encodeURIComponent(jobCategory)}`)}
-                  style={{ background: "#f5a623", color: "#000", border: "none", borderRadius: 14, padding: "10px 16px", fontWeight: 700, cursor: "pointer" }}
-                >
-                  Search
-                </button>
-              </div>
-              <div style={{ display: "flex", flexWrap: "wrap", gap: 10 }}>
-                {["All", "Full-time", "Part-time", "Contract", "Internship"].map(label => (
-                  <button
-                    key={label}
-                    type="button"
-                    onClick={() => {
-                      setJobCategory(label)
-                      router.push(`/jobs?search=${encodeURIComponent(jobSearch)}&type=${encodeURIComponent(label)}`)
-                    }}
-                    style={{
-                      background: jobCategory === label ? "#f5a623" : "rgba(255,255,255,0.1)",
-                      border: "1px solid rgba(255,255,255,0.12)",
-                      borderRadius: 14,
-                      color: jobCategory === label ? "#000" : "#fff",
-                      fontSize: 12,
-                      padding: "10px 14px",
-                      cursor: "pointer"
-                    }}
-                  >
-                    {label}
-                  </button>
-                ))}
-              </div>
-            </div>
-          </div>
-        </div>
-      </section>
+      {/* Job board removed */}
 
       {/* ── Features strip ── */}
       <section style={{ background: "#111", padding: "14px 16px", borderTop: "1px solid #1a1a1a", borderBottom: "1px solid #1a1a1a" }}>
@@ -213,32 +144,7 @@ export default function HomePage() {
       </section>
 
       <section style={{ padding: "16px 16px", marginTop: 12 }}>
-        <div style={{ display: 'flex', justifyContent: 'center' }}>
-          <div style={{ width: 320, maxWidth: '100%', display: 'flex', alignItems: 'center', gap: 12, background: 'linear-gradient(90deg, rgba(245,166,35,0.06), rgba(13,13,13,0.6))', border: '1px solid rgba(245,166,35,0.12)', borderRadius: 16, padding: 12, boxShadow: '0 8px 24px rgba(0,0,0,0.3)' }}>
-            <div style={{ width: 68, height: 68, borderRadius: 12, background: 'linear-gradient(180deg,#f5a623,#d88b1a)', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#000', fontWeight: 900, fontSize: 18 }}>
-              👀
-            </div>
-            <div style={{ flex: 1, minWidth: 0 }}>
-              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'baseline', gap: 8 }}>
-                <div>
-                  <div style={{ fontSize: 13, fontWeight: 800, color: '#fff' }}>Visitor Stats</div>
-                  <div style={{ fontSize: 11, color: '#bbb', marginTop: 2 }}>Live • updated on page load</div>
-                </div>
-                <div style={{ textAlign: 'right' }}>
-                  <div style={{ fontSize: 18, fontWeight: 900, color: '#f5a623' }}>—</div>
-                </div>
-              </div>
-              <div style={{ marginTop: 8, display: 'flex', gap: 8, alignItems: 'center' }}>
-                <div style={{ flex: 1, background: 'rgba(255,255,255,0.03)', borderRadius: 10, padding: '12px 14px', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-                  <div>
-                    <div style={{ fontSize: 12, color: '#aaa' }}>Total visitors</div>
-                    <div style={{ fontSize: 18, fontWeight: 900, color: '#fff' }}><VisitorCount compact /></div>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
+        <VisitorCount />
       </section>
 
       {/* ── Latest Products ── */}

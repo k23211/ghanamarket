@@ -3,7 +3,7 @@ import { useEffect, useState } from "react";
 import { supabase } from "@/lib/supabase";
 import BottomNav from "@/app/components/BottomNav";
 
-const PRODUCT_CATEGORIES = ["Products", "Service", "Jobs"];
+const PRODUCT_CATEGORIES = ["Products", "Service", "Other"];
 
 export default function SellerDashboard() {
   const [user, setUser] = useState<any>(null);
@@ -194,7 +194,7 @@ export default function SellerDashboard() {
         <div style={{ position: "absolute", inset: 0, background: "linear-gradient(to bottom, rgba(0,0,0,0.3), rgba(13,13,13,0.95))" }} />
         <div style={{ position: "absolute", bottom: 16, left: 16, zIndex: 2 }}>
           <p style={{ margin: 0, fontSize: 20, fontWeight: 900 }}>Welcome back, <span style={{ color: "#f5a623" }}>{profile?.full_name?.split(" ")[0] || "Seller"}</span></p>
-          <p style={{ margin: 0, fontSize: 12, color: "#aaa" }}>Manage your products, services and job listings</p>
+          <p style={{ margin: 0, fontSize: 12, color: "#aaa" }}>Manage your products and services</p>
         </div>
       </section>
 
