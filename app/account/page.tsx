@@ -236,9 +236,6 @@ export default function AccountPage() {
     </div>
   );
 
-  const activeCount = products.filter(p => p.status === 'active').length;
-  const soldCount = products.filter(p => p.status === 'sold').length;
-
   return (
     <main style={styles.main}>
       <div style={styles.banner}>
@@ -276,21 +273,6 @@ export default function AccountPage() {
             style={{ display: 'none' }}
             onChange={handleAvatarSelect}
           />
-        </div>
-      </div>
-
-      <div style={styles.statsRow}>
-        <div style={styles.statBox}>
-          <span style={styles.statNum}>{products.length}</span>
-          <span style={styles.statLabel}>Listings</span>
-        </div>
-        <div style={styles.statBox}>
-          <span style={styles.statNum}>{activeCount}</span>
-          <span style={styles.statLabel}>Active</span>
-        </div>
-        <div style={styles.statBox}>
-          <span style={styles.statNum}>{soldCount}</span>
-          <span style={styles.statLabel}>Sold</span>
         </div>
       </div>
 
