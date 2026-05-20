@@ -4,8 +4,6 @@ import { useEffect, useState } from 'react'
 
 type VisitorStats = {
   count: number
-  todayCount: number
-  monthCount: number
 }
 
 export default function VisitorCount({ compact }: { compact?: boolean }) {
@@ -21,8 +19,6 @@ export default function VisitorCount({ compact }: { compact?: boolean }) {
 
         setStats({
           count: typeof json.count === 'number' ? json.count : 0,
-          todayCount: typeof json.todayCount === 'number' ? json.todayCount : 0,
-          monthCount: typeof json.monthCount === 'number' ? json.monthCount : 0,
         })
       } catch (e) {
         console.error('VisitorCount error', e)
@@ -49,18 +45,6 @@ export default function VisitorCount({ compact }: { compact?: boolean }) {
         </div>
         <div style={{ marginTop: 8, fontSize: 13, color: '#aaa', letterSpacing: 0.5 }}>Total Visitors</div>
       </div>
-
-      <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 10, marginTop: 14, width: '100%' }}>
-        <div style={{ background: '#111', border: '1px solid #2a2a2a', borderRadius: 18, padding: '14px 12px', textAlign: 'center' }}>
-          <div style={{ fontSize: 20, fontWeight: 800, color: '#fff' }}>{stats?.todayCount == null ? '—' : stats.todayCount}</div>
-          <div style={{ fontSize: 11, color: '#888', marginTop: 6 }}>Today</div>
-        </div>
-        <div style={{ background: '#111', border: '1px solid #2a2a2a', borderRadius: 18, padding: '14px 12px', textAlign: 'center' }}>
-          <div style={{ fontSize: 20, fontWeight: 800, color: '#fff' }}>{stats?.monthCount == null ? '—' : stats.monthCount}</div>
-          <div style={{ fontSize: 11, color: '#888', marginTop: 6 }}>This month</div>
-        </div>
-      </div>
-
       <div style={{ marginTop: 12, fontSize: 11, color: '#666', textAlign: 'center' }}>
         Updated on each visit to the home page
       </div>

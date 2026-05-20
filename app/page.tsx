@@ -229,13 +229,11 @@ export default function HomePage() {
                 </div>
               </div>
               <div style={{ marginTop: 8, display: 'flex', gap: 8, alignItems: 'center' }}>
-                <div style={{ flex: 1, background: 'rgba(255,255,255,0.03)', borderRadius: 10, padding: '8px 10px', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                  <div style={{ fontSize: 12, color: '#aaa' }}>Total</div>
-                  <div style={{ fontSize: 14, fontWeight: 900, color: '#fff' }}><VisitorCount compact /></div>
-                </div>
-                <div style={{ width: 86, background: 'rgba(255,255,255,0.03)', borderRadius: 10, padding: '8px 10px', textAlign: 'center' }}>
-                  <div style={{ fontSize: 11, color: '#aaa' }}>Today</div>
-                  <div style={{ fontSize: 13, fontWeight: 800, color: '#fff' }}>—</div>
+                <div style={{ flex: 1, background: 'rgba(255,255,255,0.03)', borderRadius: 10, padding: '12px 14px', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+                  <div>
+                    <div style={{ fontSize: 12, color: '#aaa' }}>Total visitors</div>
+                    <div style={{ fontSize: 18, fontWeight: 900, color: '#fff' }}><VisitorCount compact /></div>
+                  </div>
                 </div>
               </div>
             </div>
