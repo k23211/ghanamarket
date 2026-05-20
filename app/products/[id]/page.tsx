@@ -143,7 +143,7 @@ export default function ProductDetailPage() {
           </div>
         )}
 
-        {/* Seller Info */}
+        {/* Seller Info (inline) */}
         <div style={{
           background: "#111",
           border: "1px solid #1e1e1e",
@@ -153,6 +153,7 @@ export default function ProductDetailPage() {
           alignItems: "center",
           gap: 12,
           marginBottom: 24,
+          flexWrap: "wrap",
         }}>
           <div style={{
             width: 44,
@@ -169,21 +170,36 @@ export default function ProductDetailPage() {
           }}>
             {seller?.full_name?.[0]?.toUpperCase() || "S"}
           </div>
-          <div style={{ flex: 1 }}>
+          <div style={{ flex: 1, minWidth: 160 }}>
             <p style={{ margin: "0 0 2px", fontWeight: 700, fontSize: 14 }}>
               {seller?.full_name || "Seller"}
             </p>
             <p style={{ margin: 0, fontSize: 11, color: "#555" }}>
               ✅ Verified Seller
             </p>
+            {seller?.location && <div style={{ marginTop: 8, fontSize: 12, color: '#aaa' }}>📍 {seller.location}</div>}
           </div>
-          {/* FIX: View Profile is now a real <a> link instead of a <span> */}
-          <a
-            href={`/profile/${product.seller_id}`}
-            style={{ fontSize: 10, color: "#f5a623", fontWeight: 700, textDecoration: "none" }}
-          >
-            View Profile →
-          </a>
+
+          <div style={{ display: 'flex', gap: 8, alignItems: 'center' }}>
+            {seller?.phone && user?.id !== product?.seller_id && (
+              <>
+                <a
+                  href={`tel:${seller.phone}`}
+                  style={{ fontSize: 13, background: '#f5a623', color: '#000', padding: '8px 12px', borderRadius: 10, fontWeight: 800, textDecoration: 'none' }}
+                >
+                  📞 Call
+                </a>
+                <a
+                  href={`https://wa.me/${seller.phone}`}
+                  target="_blank"
+                  rel="noreferrer"
+                  style={{ fontSize: 13, background: '#1a3a1a', color: '#4caf50', padding: '8px 12px', borderRadius: 10, fontWeight: 800, textDecoration: 'none' }}
+                >
+                  💬 WhatsApp
+                </a>
+              </>
+            )}
+          </div>
         </div>
       </section>
 
