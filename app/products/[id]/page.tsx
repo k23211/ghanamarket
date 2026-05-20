@@ -174,14 +174,11 @@ export default function ProductDetailPage() {
             <p style={{ margin: "0 0 2px", fontWeight: 700, fontSize: 14 }}>
               {seller?.full_name || "Seller"}
             </p>
-            <p style={{ margin: 0, fontSize: 11, color: "#555" }}>
-              ✅ Verified Seller
-            </p>
             {seller?.location && <div style={{ marginTop: 8, fontSize: 12, color: '#aaa' }}>📍 {seller.location}</div>}
           </div>
 
           <div style={{ display: 'flex', gap: 8, alignItems: 'center' }}>
-            {seller?.phone && user?.id !== product?.seller_id && (
+            {seller?.phone && (
               <>
                 <a
                   href={`tel:${seller.phone}`}
@@ -197,6 +194,7 @@ export default function ProductDetailPage() {
                 >
                   💬 WhatsApp
                 </a>
+                <div style={{ marginLeft: 8, fontSize: 12, color: '#ddd' }}>{seller.phone}</div>
               </>
             )}
           </div>
@@ -204,7 +202,7 @@ export default function ProductDetailPage() {
       </section>
 
       {/* Action Buttons */}
-      {seller?.phone && user?.id !== product?.seller_id && (
+      {seller?.phone && (
         <div style={{
           position: "fixed",
           bottom: 70,
