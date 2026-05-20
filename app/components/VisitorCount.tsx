@@ -52,7 +52,7 @@ export default function VisitorCount({ compact }: { compact?: boolean }) {
   }
 
   return (
-    <div style={{ background: "#111", border: "1px solid rgba(255,255,255,0.08)", borderRadius: 24, padding: 20, boxSizing: "border-box", width: "100%", maxWidth: 520, margin: "0 auto" }}>
+    <div style={{ background: "url('/job.png') center / cover no-repeat, #111", border: "1px solid rgba(255,255,255,0.08)", borderRadius: 24, padding: 20, boxSizing: "border-box", width: "100%", maxWidth: 520, margin: "0 auto" }}>
       <div style={{ display: "flex", justifyContent: "space-between", flexWrap: "wrap", alignItems: "center", gap: 12 }}>
         <div>
           <div style={{ fontSize: 13, fontWeight: 800, color: "#fff", marginBottom: 4 }}>Visitor Stats</div>
