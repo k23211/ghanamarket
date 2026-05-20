@@ -124,8 +124,6 @@ export default function HomePage() {
         </div>
       </section>
 
-      {/* Job board removed */}
-
       {/* ── Features strip ── */}
       <section style={{ background: "#111", padding: "14px 16px", borderTop: "1px solid #1a1a1a", borderBottom: "1px solid #1a1a1a" }}>
         <div style={{ display: "flex", justifyContent: "space-between" }}>
