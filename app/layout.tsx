@@ -5,8 +5,8 @@ import VisitorTracker from "@/app/components/VisitorTracker";
 import HelpWidget from "@/app/components/HelpWidget";
 
 export const metadata: Metadata = {
-  title: "Vendoxa",
-  description: "Vendoxa online marketplace in Ghana",
+  title: "Agriquex",
+  description: "Agriquex online marketplace in Ghana",
 };
 
 export default function RootLayout({

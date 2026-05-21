@@ -3,8 +3,8 @@
 import { useState, useEffect } from 'react';
 
 const SUGGESTIONS = [
-  { label: 'Report an issue', value: 'I found a bug or problem on Vendoxa.' },
-  { label: 'Ask about selling', value: 'I want to know how to sell on Vendoxa.' },
+  { label: 'Report an issue', value: 'I found a bug or problem on Agriquex.' },
+  { label: 'Ask about selling', value: 'I want to know how to sell on Agriquex.' },
   { label: 'Ask about buying', value: 'I need help finding a product to buy.' },
   { label: 'Contact support', value: 'I need assistance with my account or payment.' },
 ];
@@ -16,11 +16,11 @@ export default function HelpWidget() {
 
   useEffect(() => {
     const handler = () => setOpen(true);
-    window.addEventListener('openVendoxaHelp', handler);
-    return () => window.removeEventListener('openVendoxaHelp', handler);
+    window.addEventListener('openAgriquexHelp', handler);
+    return () => window.removeEventListener('openAgriquexHelp', handler);
   }, []);
 
-  const subject = encodeURIComponent('Vendoxa Help Request');
+  const subject = encodeURIComponent('Agriquex Help Request');
   const body = encodeURIComponent(
     `${suggestion ? `AI assistance prompt: ${suggestion}\n\n` : ''}${message}`
   );
@@ -42,7 +42,7 @@ export default function HelpWidget() {
       }}>
           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 12 }}>
             <div>
-              <div style={{ fontSize: 15, fontWeight: 800 }}>Vendoxa Help</div>
+              <div style={{ fontSize: 15, fontWeight: 800 }}>Agriquex Help</div>
               <div style={{ fontSize: 11, color: '#aaa', marginTop: 2 }}>AI assistance and fast contact support</div>
             </div>
             <button
@@ -115,7 +115,7 @@ export default function HelpWidget() {
               textDecoration: 'none',
             }}
           >
-            Send message to Vendoxa
+            Send message to Agriquex
           </a>
 
           <div style={{ marginTop: 12, fontSize: 11, color: '#777', lineHeight: 1.4 }}>

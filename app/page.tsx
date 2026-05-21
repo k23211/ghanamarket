@@ -135,7 +135,7 @@ export default function HomePage() {
         }} />
         <div style={{ position: "absolute", bottom: 28, left: 20, right: 20, zIndex: 2 }}>
           <h1 style={{ margin: "0 0 6px", fontSize: 26, fontWeight: 900, lineHeight: 1.2 }}>
-            Vendoxa: <span style={{ color: "#f5a623" }}>Trusted</span><br />Marketplace
+            Agriquex: <span style={{ color: "#f5a623" }}>Trusted</span><br />Marketplace
           </h1>
           <p style={{ margin: 0, color: "#aaa", fontSize: 13 }}>
             Buy and sell with confidence across Ghana
@@ -157,7 +157,7 @@ export default function HomePage() {
               type="button"
               onClick={() => {
                 if (f.action) {
-                  window.dispatchEvent(new Event('openVendoxaHelp'));
+                  window.dispatchEvent(new Event('openAgriquexHelp'));
                 }
               }}
               style={{
