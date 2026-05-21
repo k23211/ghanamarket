@@ -6,11 +6,10 @@ const supabaseKey = process.env.SUPABASE_SERVICE_ROLE_KEY
 
 const supabase = createClient(supabaseUrl, supabaseKey || process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!)
 
-export async function GET(
-  _request: Request,
-  { params }: { params: { id: string } }
-) {
-  const sellerId = params.id
+export async function GET(request: Request) {
+  const url = new URL(request.url)
+  const match = url.pathname.match(/\/api\/public-profile\/([^\/]+)/)
+  const sellerId = match?.[1]
 
   if (!sellerId) {
     return NextResponse.json({ error: 'Seller ID is required' }, { status: 400 })
