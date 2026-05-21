@@ -105,7 +105,16 @@ export default function HomePage() {
         ) : (
           <a
             href="/auth"
-            style={{ background: "#f5a623", color: "#000", fontSize: 12, fontWeight: 800, padding: "7px 16px", borderRadius: 20, textDecoration: "none" }}
+            style={{
+              background: "linear-gradient(135deg, #f5a623, #ffd54f)",
+              color: "#111",
+              fontSize: 12,
+              fontWeight: 800,
+              padding: "10px 18px",
+              borderRadius: 22,
+              textDecoration: "none",
+              boxShadow: "0 16px 30px rgba(245, 166, 35, 0.18)",
+            }}
           >
             Sign In
           </a>
@@ -163,13 +172,14 @@ export default function HomePage() {
               href="/products"
               style={{
                 display: "block",
-                background: "#131313",
-                border: "1px solid #1e1e1e",
-                borderRadius: 14,
-                padding: "14px 10px",
+                background: "#141414",
+                border: "1px solid rgba(255,255,255,0.08)",
+                borderRadius: 18,
+                padding: "16px 10px",
                 textAlign: "center",
                 color: "#fff",
                 textDecoration: "none",
+                boxShadow: "0 18px 40px rgba(0,0,0,0.14)",
               }}
             >
               <div style={{ fontSize: 22, marginBottom: 6 }}>{cat.icon}</div>
@@ -231,6 +241,7 @@ export default function HomePage() {
                   display: "block",
                   cursor: "pointer",
                   transition: "transform 0.2s, border-color 0.2s",
+                  boxShadow: "0 18px 42px rgba(0,0,0,0.18)",
                 }}
                 onMouseEnter={(e) => {
                   e.currentTarget.style.transform = "translateY(-4px)";
@@ -280,7 +291,7 @@ export default function HomePage() {
                     </div>
                   ) : (
                     <p style={{ margin: 0, fontSize: 10, color: "#666" }}>No rating yet</p>
-                  )
+                  )}
                 </div>
               </a>
             ))}
@@ -307,7 +318,17 @@ export default function HomePage() {
             </div>
             <a
               href="/auth"
-              style={{ flexShrink: 0, background: "#f5a623", color: "#000", fontWeight: 800, fontSize: 12, padding: "10px 16px", borderRadius: 20, textDecoration: "none" }}
+              style={{
+                flexShrink: 0,
+                background: "linear-gradient(135deg, #f5a623, #ffc95e)",
+                color: "#111",
+                fontWeight: 800,
+                fontSize: 12,
+                padding: "10px 18px",
+                borderRadius: 24,
+                textDecoration: "none",
+                boxShadow: "0 18px 32px rgba(245, 166, 35, 0.2)",
+              }}
             >
               Join Now
             </a>

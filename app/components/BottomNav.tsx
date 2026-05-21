@@ -19,15 +19,15 @@ export default function BottomNav() {
       transform: "translateX(-50%)",
       width: "100%",
       maxWidth: 520,
-      background: "rgba(17, 17, 17, 0.97)",
+      background: "rgba(10, 10, 10, 0.96)",
       borderTop: "1px solid rgba(255, 255, 255, 0.08)",
-      boxShadow: "0 -14px 30px rgba(0, 0, 0, 0.35)",
+      boxShadow: "0 -18px 42px rgba(0, 0, 0, 0.35)",
       display: "flex",
       justifyContent: "space-between",
       gap: 12,
       padding: "12px 14px 18px",
       zIndex: 50,
-      backdropFilter: "blur(16px)",
+      backdropFilter: "blur(18px)",
     }}>
       {tabs.map(tab => {
         const active = pathname === tab.href || (tab.href !== "/" && pathname.startsWith(tab.href));
@@ -43,15 +43,15 @@ export default function BottomNav() {
               gap: 4,
               minWidth: 68,
               flex: 1,
-              padding: "10px 8px",
-              borderRadius: 18,
+              padding: "10px 10px",
+              borderRadius: 20,
               textDecoration: "none",
-              color: active ? "#f5a623" : "#cfd2dc",
-              background: active ? "rgba(245, 166, 35, 0.12)" : "transparent",
-              boxShadow: active ? "0 12px 24px rgba(245, 166, 35, 0.14)" : "none",
-              transition: "transform 150ms ease, background 150ms ease, color 150ms ease, box-shadow 150ms ease",
+              color: active ? "#f5a623" : "#d1d5db",
+              background: active ? "rgba(245, 166, 35, 0.15)" : "rgba(255,255,255,0.02)",
+              boxShadow: active ? "0 16px 30px rgba(245, 166, 35, 0.16)" : "0 0 0 rgba(0,0,0,0)",
+              transition: "transform 180ms ease, background 180ms ease, color 180ms ease, box-shadow 180ms ease",
             }}>
-            <span style={{ fontSize: 22 }}>{tab.icon}</span>
+            <span style={{ fontSize: 20 }}>{tab.icon}</span>
             <span style={{ fontSize: 11, fontWeight: active ? 700 : 500 }}>
               {tab.label}
             </span>

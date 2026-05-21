@@ -73,7 +73,7 @@ export default function ProductsPage() {
 
         {/* Search */}
         <div style={{ position: "relative" }}>
-          <span style={{ position: "absolute", left: 12, top: "50%", transform: "translateY(-50%)", fontSize: 14, color: "#555" }}>🔍</span>
+          <span style={{ position: "absolute", left: 14, top: "50%", transform: "translateY(-50%)", fontSize: 14, color: "#777" }}>🔍</span>
           <input
             type="text"
             placeholder="Search products..."
@@ -81,13 +81,14 @@ export default function ProductsPage() {
             onChange={e => setSearch(e.target.value)}
             style={{
               width: "100%",
-              background: "#1a1a1a",
-              border: "1px solid #2a2a2a",
-              borderRadius: 12,
-              padding: "10px 12px 10px 36px",
+              background: "#121212",
+              border: "1px solid rgba(255,255,255,0.08)",
+              borderRadius: 14,
+              padding: "12px 14px 12px 40px",
               color: "#fff",
-              fontSize: 13,
+              fontSize: 14,
               boxSizing: "border-box",
+              boxShadow: "0 12px 30px rgba(0,0,0,0.12)",
             }}
           />
         </div>
@@ -102,15 +103,16 @@ export default function ProductsPage() {
               onClick={() => setActiveCategory(cat)}
               style={{
                 flexShrink: 0,
-                background: activeCategory === cat ? "#f5a623" : "#1a1a1a",
-                color: activeCategory === cat ? "#000" : "#888",
-                fontWeight: activeCategory === cat ? 800 : 500,
+                background: activeCategory === cat ? "rgba(245,166,35,0.18)" : "rgba(255,255,255,0.04)",
+                color: activeCategory === cat ? "#f5a623" : "#d1d5db",
+                fontWeight: activeCategory === cat ? 800 : 600,
                 fontSize: 12,
-                padding: "7px 16px",
-                borderRadius: 20,
-                border: "none",
+                padding: "9px 16px",
+                borderRadius: 18,
+                border: "1px solid rgba(255,255,255,0.08)",
                 cursor: "pointer",
                 whiteSpace: "nowrap",
+                boxShadow: activeCategory === cat ? "0 12px 28px rgba(245,166,35,0.12)" : "none",
               }}
             >
               {cat}
@@ -134,11 +136,12 @@ export default function ProductsPage() {
           </div>
         ) : filtered.length === 0 ? (
           <div style={{
-            background: "#111",
-            borderRadius: 16,
+            background: "#121212",
+            borderRadius: 20,
             padding: "50px 20px",
             textAlign: "center",
-            border: "1px dashed #2a2a2a",
+            border: "1px dashed rgba(255,255,255,0.08)",
+            boxShadow: "0 18px 40px rgba(0,0,0,0.12)",
           }}>
             <div style={{ fontSize: 40, marginBottom: 12 }}>🔍</div>
             <p style={{ color: "#555", fontSize: 14, margin: "0 0 8px" }}>No products found</p>
@@ -153,10 +156,11 @@ export default function ProductsPage() {
                 style={{ textDecoration: "none", color: "inherit" }}
               >
                 <div style={{
-                  background: "#111",
-                  borderRadius: 14,
+                  background: "#121212",
+                  borderRadius: 18,
                   overflow: "hidden",
-                  border: "1px solid #1e1e1e",
+                  border: "1px solid rgba(255,255,255,0.06)",
+                  boxShadow: "0 18px 42px rgba(0,0,0,0.18)",
                 }}>
                   <div style={{ height: 150, background: "#1a1a1a", position: "relative" }}>
                     {product.image_url ? (
