@@ -48,7 +48,7 @@ export default function ProductsPage() {
 
   return (
     <main style={{
-      backgroundColor: "#0d0d0d",
+      background: "linear-gradient(rgba(13,13,13,0.92), rgba(13,13,13,0.95)), url('/browse.png') center / cover no-repeat",
       color: "#fff",
       fontFamily: "'Segoe UI', sans-serif",
       maxWidth: 480,
