@@ -150,12 +150,28 @@ export default function HomePage() {
             { icon: "🛡️", label: "Secure Pay" },
             { icon: "🚚", label: "Fast Delivery" },
             { icon: "🏅", label: "Quality" },
-            { icon: "🎧", label: "24/7 Support" },
+            { icon: "🎧", label: "24/7 Support", action: true },
           ].map(f => (
-            <div key={f.label} style={{ textAlign: "center", flex: 1 }}>
+            <button
+              key={f.label}
+              type="button"
+              onClick={() => {
+                if (f.action) {
+                  window.dispatchEvent(new Event('openVendoxaHelp'));
+                }
+              }}
+              style={{
+                textAlign: "center",
+                flex: 1,
+                background: 'transparent',
+                border: 'none',
+                color: '#fff',
+                cursor: f.action ? 'pointer' : 'default',
+              }}
+            >
               <div style={{ fontSize: 20, marginBottom: 4 }}>{f.icon}</div>
-              <p style={{ fontSize: 9, color: "#666", margin: 0 }}>{f.label}</p>
-            </div>
+              <p style={{ fontSize: 9, color: f.action ? '#f5a623' : '#666', margin: 0 }}>{f.label}</p>
+            </button>
           ))}
         </div>
       </section>

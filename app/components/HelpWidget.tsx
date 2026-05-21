@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 
 const SUGGESTIONS = [
   { label: 'Report an issue', value: 'I found a bug or problem on Vendoxa.' },
@@ -14,26 +14,32 @@ export default function HelpWidget() {
   const [message, setMessage] = useState('');
   const [suggestion, setSuggestion] = useState('');
 
+  useEffect(() => {
+    const handler = () => setOpen(true);
+    window.addEventListener('openVendoxaHelp', handler);
+    return () => window.removeEventListener('openVendoxaHelp', handler);
+  }, []);
+
   const subject = encodeURIComponent('Vendoxa Help Request');
   const body = encodeURIComponent(
     `${suggestion ? `AI assistance prompt: ${suggestion}\n\n` : ''}${message}`
   );
   const mailto = `mailto:ghanamarketplacegh@gmail.com?subject=${subject}&body=${body}`;
 
+  if (!open) return null;
+
   return (
-    <div style={{ position: 'fixed', bottom: 24, right: 24, zIndex: 60 }}>
-      {open && (
-        <div style={{
-          width: 320,
-          background: '#111',
-          border: '1px solid rgba(255,255,255,0.08)',
-          borderRadius: 22,
-          boxShadow: '0 24px 60px rgba(0,0,0,0.35)',
-          color: '#fff',
-          padding: 16,
-          marginBottom: 12,
-          fontFamily: "'Segoe UI', sans-serif",
-        }}>
+    <div style={{ position: 'fixed', bottom: 110, left: 24, zIndex: 60, width: 320 }}>
+      <div style={{
+        width: '100%',
+        background: '#111',
+        border: '1px solid rgba(255,255,255,0.08)',
+        borderRadius: 22,
+        boxShadow: '0 24px 60px rgba(0,0,0,0.35)',
+        color: '#fff',
+        padding: 16,
+        fontFamily: "'Segoe UI', sans-serif",
+      }}>
           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 12 }}>
             <div>
               <div style={{ fontSize: 15, fontWeight: 800 }}>Vendoxa Help</div>
@@ -116,26 +122,7 @@ export default function HelpWidget() {
             Your report will be sent to <strong>ghanamarketplacegh@gmail.com</strong>.
           </div>
         </div>
-      )}
-
-      <button
-        onClick={() => setOpen(prev => !prev)}
-        style={{
-          width: 56,
-          height: 56,
-          borderRadius: '50%',
-          border: 'none',
-          background: '#f5a623',
-          color: '#111',
-          fontSize: 24,
-          fontWeight: 800,
-          cursor: 'pointer',
-          boxShadow: '0 20px 40px rgba(0,0,0,0.24)',
-        }}
-        aria-label="Open help"
-      >
-        ?
-      </button>
-    </div>
-  );
+      </div>
+    );
 }
+
