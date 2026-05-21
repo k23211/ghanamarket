@@ -17,7 +17,7 @@ export default function VisitorCount({ compact }: { compact?: boolean }) {
     let mounted = true
     const inc = async () => {
       try {
-        const res = await fetch("/api/visitors", { method: "POST" })
+        const res = await fetch("/api/visitors")
         const json = await res.json()
         if (!mounted) return
 
