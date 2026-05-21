@@ -52,53 +52,39 @@ export default function VisitorCount({ compact }: { compact?: boolean }) {
   }
 
   return (
-    <div style={{ background: "url('/job.png') center / cover no-repeat, #111", border: "1px solid rgba(255,255,255,0.08)", borderRadius: 24, padding: 20, boxSizing: "border-box", width: "100%", maxWidth: 520, margin: "0 auto" }}>
-      <div style={{ display: "flex", justifyContent: "space-between", flexWrap: "wrap", alignItems: "center", gap: 12 }}>
+    <div style={{ background: "url('/job.png') center / cover no-repeat, rgba(17,17,17,0.95)", border: "1px solid rgba(255,255,255,0.1)", borderRadius: 20, padding: 16, boxSizing: "border-box", width: "100%", maxWidth: 420, margin: "0 auto", boxShadow: "0 24px 60px rgba(0,0,0,0.25)" }}>
+      <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", gap: 12, flexWrap: "wrap" }}>
         <div>
-          <div style={{ fontSize: 13, fontWeight: 800, color: "#fff", marginBottom: 4 }}>Visitor Stats</div>
-          <div style={{ display: "inline-flex", alignItems: "center", gap: 8, fontSize: 11, color: "#aaa" }}>
-            <span style={{ display: "inline-flex", alignItems: "center", justifyContent: "center", width: 18, height: 18, borderRadius: 999, background: "#163b15", color: "#81d35e", fontWeight: 700 }}>Live</span>
-            Real-time overview of visitors
+          <div style={{ fontSize: 14, fontWeight: 800, color: "#fff", marginBottom: 6 }}>Visitor Stats</div>
+          <div style={{ color: "#bbb", fontSize: 11, lineHeight: 1.4, maxWidth: 240 }}>
+            Real-time visitors and traffic insights across your store.
           </div>
         </div>
-        <div style={{ minWidth: 120, textAlign: "right" }}>
-          <div style={{ fontSize: 13, color: "#aaa" }}>Total users</div>
+        <div style={{ textAlign: "right", minWidth: 100 }}>
+          <div style={{ fontSize: 11, color: "#aaa", textTransform: "uppercase", letterSpacing: 1.2, marginBottom: 4 }}>Users</div>
           <div style={{ fontSize: 22, fontWeight: 900, color: "#f5a623" }}>{stats?.userCount ?? "—"}</div>
         </div>
       </div>
 
-      <div style={{ display: "grid", gap: 20, marginTop: 20 }}>
-        <div style={{ display: "flex", gap: 20, flexWrap: "wrap" }}>
-          <div style={{ flex: 1, minWidth: 180, background: "#0d0d0d", border: "1px solid rgba(255,255,255,0.08)", borderRadius: 18, padding: 18 }}>
-            <div style={{ fontSize: 11, color: "#aaa", textTransform: "uppercase", letterSpacing: 1.2 }}>Visitors online</div>
-            <div style={{ fontSize: 44, fontWeight: 900, color: "#f5a623", marginTop: 6 }}>{stats?.count ?? "—"}</div>
-            <div style={{ fontSize: 12, color: "#bbb", marginTop: 4 }}>Total visitors tracked</div>
-          </div>
-
-          <div style={{ flex: 1, minWidth: 180, background: "#0d0d0d", border: "1px solid rgba(255,255,255,0.08)", borderRadius: 18, padding: 18, display: "grid", gap: 12 }}>
-            <div style={{ display: "flex", justifyContent: "space-between", gap: 12 }}>
-              <div>
-                <div style={{ fontSize: 11, color: "#aaa", textTransform: "uppercase", letterSpacing: 1.2 }}>Today</div>
-                <div style={{ fontSize: 20, fontWeight: 900, color: "#fff" }}>{stats?.todayCount ?? 0}</div>
-              </div>
-              <div>
-                <div style={{ fontSize: 11, color: "#aaa", textTransform: "uppercase", letterSpacing: 1.2 }}>This month</div>
-                <div style={{ fontSize: 20, fontWeight: 900, color: "#fff" }}>{stats?.monthCount ?? 0}</div>
-              </div>
-            </div>
-            <div style={{ height: 68, borderRadius: 16, background: "linear-gradient(180deg, rgba(245,166,35,0.16), rgba(255,255,255,0.03))", display: "flex", alignItems: "flex-end", gap: 6, padding: "10px 12px" }}>
-              {Array.from({ length: 7 }).map((_, index) => (
-                <div key={index} style={{ flex: 1, height: `${30 + index * 8}%`, borderRadius: 999, background: "#f5a623" }} />
-              ))}
-            </div>
-          </div>
+      <div style={{ display: "grid", gridTemplateColumns: "repeat(3, minmax(0, 1fr))", gap: 12, marginTop: 16 }}>
+        <div style={{ background: "rgba(255,255,255,0.05)", border: "1px solid rgba(255,255,255,0.08)", borderRadius: 16, padding: 12 }}>
+          <div style={{ fontSize: 10, color: "#aaa", textTransform: "uppercase", letterSpacing: 1.2 }}>Online</div>
+          <div style={{ fontSize: 20, fontWeight: 900, color: "#f5a623", marginTop: 6 }}>{stats?.count ?? "—"}</div>
         </div>
+        <div style={{ background: "rgba(255,255,255,0.05)", border: "1px solid rgba(255,255,255,0.08)", borderRadius: 16, padding: 12 }}>
+          <div style={{ fontSize: 10, color: "#aaa", textTransform: "uppercase", letterSpacing: 1.2 }}>Today</div>
+          <div style={{ fontSize: 20, fontWeight: 900, color: "#fff", marginTop: 6 }}>{stats?.todayCount ?? 0}</div>
+        </div>
+        <div style={{ background: "rgba(255,255,255,0.05)", border: "1px solid rgba(255,255,255,0.08)", borderRadius: 16, padding: 12 }}>
+          <div style={{ fontSize: 10, color: "#aaa", textTransform: "uppercase", letterSpacing: 1.2 }}>This month</div>
+          <div style={{ fontSize: 20, fontWeight: 900, color: "#fff", marginTop: 6 }}>{stats?.monthCount ?? 0}</div>
+        </div>
+      </div>
 
-        <div style={{ display: "flex", justifyContent: "space-between", gap: 12, flexWrap: "wrap", alignItems: "center" }}>
-          <div style={{ fontSize: 11, color: "#aaa" }}>vs yesterday</div>
-          <div style={{ display: "inline-flex", alignItems: "center", gap: 6, fontSize: 13, color: delta >= 0 ? "#7fd977" : "#ff7f7f", fontWeight: 700 }}>
-            {delta >= 0 ? "↑" : "↓"} {Math.abs(delta)} ({delta >= 0 ? "+" : "-"}{Math.abs(percent)}%)
-          </div>
+      <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", gap: 12, marginTop: 16, flexWrap: "wrap" }}>
+        <div style={{ fontSize: 11, color: "#bbb" }}>vs yesterday</div>
+        <div style={{ display: "inline-flex", alignItems: "center", gap: 6, fontSize: 12, color: delta >= 0 ? "#7fd977" : "#ff7f7f", fontWeight: 700 }}>
+          {delta >= 0 ? "↑" : "↓"} {Math.abs(delta)} ({delta >= 0 ? "+" : "-"}{Math.abs(percent)}%)
         </div>
       </div>
     </div>
