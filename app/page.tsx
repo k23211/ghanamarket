@@ -5,10 +5,20 @@ import BottomNav from "@/app/components/BottomNav";
 import VisitorCount from "@/app/components/VisitorCount";
 
 // ── Stars ─────────────────────────────────────────────────────────────────
-function Stars({ n = 5 }: { n?: number }) {
+const TOP_CATEGORIES = [
+  { label: "Electronics", icon: "📱" },
+  { label: "Fashion", icon: "👗" },
+  { label: "Home", icon: "🏠" },
+  { label: "Food", icon: "🍲" },
+  { label: "Vehicles", icon: "🚗" },
+  { label: "Beauty", icon: "💄" },
+];
+
+function Stars({ n = 0 }: { n?: number }) {
+  const count = Math.max(0, Math.min(5, Math.round(n)));
   return (
     <span style={{ color: "#f5a623", fontSize: 11 }}>
-      {"★".repeat(Math.min(n, 5))}{"☆".repeat(Math.max(0, 5 - n))}
+      {"★".repeat(count)}{"☆".repeat(5 - count)}
     </span>
   );
 }
@@ -141,6 +151,34 @@ export default function HomePage() {
         </div>
       </section>
 
+      <section style={{ background: "#111", padding: "16px", borderTop: "1px solid #1a1a1a", borderBottom: "1px solid #1a1a1a" }}>
+        <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 12 }}>
+          <h2 style={{ margin: 0, fontSize: 16, fontWeight: 800 }}>Top categories</h2>
+          <a href="/products" style={{ color: "#f5a623", fontSize: 12, fontWeight: 600, textDecoration: "none" }}>Browse all</a>
+        </div>
+        <div style={{ display: "grid", gridTemplateColumns: "repeat(3, minmax(0, 1fr))", gap: 10 }}>
+          {TOP_CATEGORIES.map(cat => (
+            <a
+              key={cat.label}
+              href="/products"
+              style={{
+                display: "block",
+                background: "#131313",
+                border: "1px solid #1e1e1e",
+                borderRadius: 14,
+                padding: "14px 10px",
+                textAlign: "center",
+                color: "#fff",
+                textDecoration: "none",
+              }}
+            >
+              <div style={{ fontSize: 22, marginBottom: 6 }}>{cat.icon}</div>
+              <div style={{ fontSize: 12, fontWeight: 700 }}>{cat.label}</div>
+            </a>
+          ))}
+        </div>
+      </section>
+
       <section style={{ padding: "16px 16px", marginTop: 12 }}>
         <VisitorCount />
       </section>
@@ -232,7 +270,17 @@ export default function HomePage() {
                   <p style={{ margin: "0 0 6px", fontSize: 15, fontWeight: 900, color: "#f5a623" }}>
                     GH₵ {Number(product.price).toLocaleString()}
                   </p>
-                  <Stars />
+                  {product.rating != null ? (
+                    <div style={{ display: "flex", alignItems: "center", gap: 6, flexWrap: "wrap" }}>
+                      <Stars n={Number(product.rating)} />
+                      <span style={{ fontSize: 10, color: "#aaa" }}>
+                        {Number(product.rating).toFixed(1)}
+                        {product.review_count ? ` · ${product.review_count} reviews` : ""}
+                      </span>
+                    </div>
+                  ) : (
+                    <p style={{ margin: 0, fontSize: 10, color: "#666" }}>No rating yet</p>
+                  )
                 </div>
               </a>
             ))}

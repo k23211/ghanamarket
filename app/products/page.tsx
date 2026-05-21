@@ -5,10 +5,11 @@ import BottomNav from "@/app/components/BottomNav";
 
 const CATEGORIES = ["All", "Electronics", "Fashion", "Home", "Beauty", "Food", "Vehicles", "Other"];
 
-function Stars({ n = 5 }: { n?: number }) {
+function Stars({ n = 0 }: { n?: number }) {
+  const count = Math.max(0, Math.min(5, Math.round(n)));
   return (
     <span style={{ color: "#f5a623", fontSize: 10 }}>
-      {"★".repeat(Math.min(n, 5))}{"☆".repeat(Math.max(0, 5 - n))}
+      {"★".repeat(count)}{"☆".repeat(5 - count)}
     </span>
   );
 }
@@ -140,7 +141,8 @@ export default function ProductsPage() {
             border: "1px dashed #2a2a2a",
           }}>
             <div style={{ fontSize: 40, marginBottom: 12 }}>🔍</div>
-            <p style={{ color: "#555", fontSize: 14, margin: 0 }}>No products found</p>
+            <p style={{ color: "#555", fontSize: 14, margin: "0 0 8px" }}>No products found</p>
+            <p style={{ color: "#777", fontSize: 13, margin: 0 }}>No results? Try another search or category.</p>
           </div>
         ) : (
           <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 12 }}>
@@ -187,7 +189,17 @@ export default function ProductsPage() {
                     <p style={{ margin: "0 0 6px", fontSize: 15, fontWeight: 900, color: "#f5a623" }}>
                       GH₵ {Number(product.price).toLocaleString()}
                     </p>
-                    <Stars />
+                    {product.rating != null ? (
+                      <div style={{ display: "flex", alignItems: "center", gap: 6, flexWrap: "wrap" }}>
+                        <Stars n={Number(product.rating)} />
+                        <span style={{ fontSize: 10, color: "#aaa" }}>
+                          {Number(product.rating).toFixed(1)}
+                          {product.review_count ? ` · ${product.review_count} reviews` : ""}
+                        </span>
+                      </div>
+                    ) : (
+                      <p style={{ margin: 0, fontSize: 10, color: "#666" }}>No rating yet</p>
+                    )}
                   </div>
                 </div>
               </a>
