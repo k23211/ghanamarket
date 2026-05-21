@@ -4,8 +4,8 @@ import "./globals.css";
 import VisitorTracker from "@/app/components/VisitorTracker";
 
 export const metadata: Metadata = {
-  title: "GhanaMarket",
-  description: "Ghana e-commerce store",
+  title: "Vendoxa",
+  description: "Vendoxa online marketplace in Ghana",
 };
 
 export default function RootLayout({

@@ -66,8 +66,8 @@ export default function ProductsPage() {
         borderBottom: "1px solid #1a1a1a",
       }}>
         <div style={{ marginBottom: 10 }}>
-          <span style={{ fontWeight: 900, fontSize: 20, color: "#fff" }}>Ghana</span>
-          <span style={{ fontWeight: 900, fontSize: 20, color: "#f5a623" }}>Market</span>
+          <span style={{ fontWeight: 900, fontSize: 20, color: "#fff" }}>Ven</span>
+          <span style={{ fontWeight: 900, fontSize: 20, color: "#f5a623" }}>doxa</span>
         </div>
 
         {/* Search */}

@@ -74,8 +74,8 @@ export default function HomePage() {
       }}>
         <div style={{ flex: 1 }}>
           <div>
-            <span style={{ fontWeight: 900, fontSize: 20, color: "#fff" }}>Ghana</span>
-            <span style={{ fontWeight: 900, fontSize: 20, color: "#f5a623" }}>Market</span>
+            <span style={{ fontWeight: 900, fontSize: 20, color: "#fff" }}>Ven</span>
+            <span style={{ fontWeight: 900, fontSize: 20, color: "#f5a623" }}>doxa</span>
           </div>
           <div style={{ fontSize: 10, color: "#555", marginTop: -2 }}>Buy. Sell. Connect.</div>
         </div>
@@ -116,7 +116,7 @@ export default function HomePage() {
         }} />
         <div style={{ position: "absolute", bottom: 28, left: 20, right: 20, zIndex: 2 }}>
           <h1 style={{ margin: "0 0 6px", fontSize: 26, fontWeight: 900, lineHeight: 1.2 }}>
-            Ghana's <span style={{ color: "#f5a623" }}>Trusted</span><br />Marketplace
+            Vendoxa: <span style={{ color: "#f5a623" }}>Trusted</span><br />Marketplace
           </h1>
           <p style={{ margin: 0, color: "#aaa", fontSize: 13 }}>
             Buy and sell with confidence across Ghana

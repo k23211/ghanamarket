@@ -179,8 +179,8 @@ export default function SellerDashboard() {
       <header style={{ background: "#111", padding: "14px 16px", display: "flex", alignItems: "center", justifyContent: "space-between", borderBottom: "1px solid #1a1a1a", position: "sticky", top: 0, zIndex: 40 }}>
         <div>
           <div style={{ fontWeight: 900, fontSize: 18 }}>
-            <span style={{ color: "#fff" }}>Ghana</span>
-            <span style={{ color: "#f5a623" }}>Market</span>
+            <span style={{ color: "#fff" }}>Ven</span>
+            <span style={{ color: "#f5a623" }}>doxa</span>
           </div>
           <div style={{ fontSize: 10, color: "#555" }}>Seller Dashboard</div>
         </div>
