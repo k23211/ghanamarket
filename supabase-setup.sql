@@ -1,6 +1,4 @@
--- Supabase setup for GhanaMarket job applications
-
--- 1) Create job applications table
+-- Supabase setup for Agriquex job applications
 create table if not exists job_applications (
   id uuid default gen_random_uuid() primary key,
   job_id text not null,

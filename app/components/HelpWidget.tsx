@@ -24,7 +24,7 @@ export default function HelpWidget() {
   const body = encodeURIComponent(
     `${suggestion ? `AI assistance prompt: ${suggestion}\n\n` : ''}${message}`
   );
-  const mailto = `mailto:ghanamarketplacegh@gmail.com?subject=${subject}&body=${body}`;
+  const mailto = `mailto:agriquexchangegh@gmail.com?subject=${subject}&body=${body}`;
 
   if (!open) return null;
 
@@ -119,7 +119,7 @@ export default function HelpWidget() {
           </a>
 
           <div style={{ marginTop: 12, fontSize: 11, color: '#777', lineHeight: 1.4 }}>
-            Your report will be sent to <strong>ghanamarketplacegh@gmail.com</strong>.
+            Your report will be sent to <strong>agriquexchangegh@gmail.com</strong>.
           </div>
         </div>
       </div>
