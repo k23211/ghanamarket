@@ -32,13 +32,9 @@ export default function PublicProfilePage() {
 
   useEffect(() => {
     const load = async () => {
-      const { data: prof } = await supabase
-        .from('profiles')
-        .select('*')
-        .eq('id', sellerId)
-        .single();
-
-      setProfile(prof);
+      const profileRes = await fetch(`/api/public-profile/${sellerId}`)
+      const prof = profileRes.ok ? await profileRes.json() : null
+      setProfile(prof)
 
       const { data: prods } = await supabase
         .from('products')

@@ -24,12 +24,13 @@ export default function ProductDetailPage() {
 
       if (prod) {
         setProduct(prod);
-        const { data: sellerData } = await supabase
-          .from("profiles")
-          .select("*")
-          .eq("id", prod.seller_id)
-          .single();
-        setSeller(sellerData);
+        const sellerRes = await fetch(`/api/public-profile/${prod.seller_id}`)
+        if (sellerRes.ok) {
+          const sellerData = await sellerRes.json()
+          setSeller(sellerData)
+        } else {
+          setSeller(null)
+        }
       }
       setLoading(false);
     };
