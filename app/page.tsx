@@ -84,8 +84,8 @@ export default function HomePage() {
       }}>
         <div style={{ flex: 1 }}>
           <div>
-            <span style={{ fontWeight: 900, fontSize: 20, color: "#fff" }}>Ven</span>
-            <span style={{ fontWeight: 900, fontSize: 20, color: "#f5a623" }}>doxa</span>
+            <span style={{ fontWeight: 900, fontSize: 20, color: "#fff" }}>Agri</span>
+            <span style={{ fontWeight: 900, fontSize: 20, color: "#f5a623" }}>quex</span>
           </div>
           <div style={{ fontSize: 10, color: "#555", marginTop: -2 }}>Buy. Sell. Connect.</div>
         </div>

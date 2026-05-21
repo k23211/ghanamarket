@@ -104,8 +104,8 @@ export default function AuthPage() {
         <div style={{ textAlign: "center", marginBottom: 32 }}>
           <div style={{ fontSize: 44, marginBottom: 8 }}>🛍️</div>
           <div>
-            <span style={{ fontWeight: 900, fontSize: 30, color: "#fff", letterSpacing: -1 }}>Ven</span>
-            <span style={{ fontWeight: 900, fontSize: 30, color: "#f5a623", letterSpacing: -1 }}>doxa</span>
+            <span style={{ fontWeight: 900, fontSize: 30, color: "#fff", letterSpacing: -1 }}>Agri</span>
+            <span style={{ fontWeight: 900, fontSize: 30, color: "#f5a623", letterSpacing: -1 }}>quex</span>
           </div>
           <p style={{ color: "#666", fontSize: 13, margin: "6px 0 0", letterSpacing: 1 }}>
             YOUR ONE-STOP ONLINE STORE

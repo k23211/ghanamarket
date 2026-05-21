@@ -73,8 +73,8 @@ export default function ProductDetailPage() {
       }}>
         <a href="/products" style={{ color: "#f5a623", fontSize: 20, textDecoration: "none" }}>←</a>
         <div>
-          <span style={{ fontWeight: 900, fontSize: 18, color: "#fff" }}>Ven</span>
-          <span style={{ fontWeight: 900, fontSize: 18, color: "#f5a623" }}>doxa</span>
+          <span style={{ fontWeight: 900, fontSize: 18, color: "#fff" }}>Agri</span>
+          <span style={{ fontWeight: 900, fontSize: 18, color: "#f5a623" }}>quex</span>
         </div>
       </header>
 
