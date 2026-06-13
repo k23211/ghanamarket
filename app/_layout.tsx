@@ -3,7 +3,11 @@ import { Slot, useRouter, useSegments } from 'expo-router';
 import { supabase } from '../lib/supabase';
 import { Session } from '@supabase/supabase-js';
 import { View, ActivityIndicator } from 'react-native';
-import { Colors } from '../constants/colors';
+
+const Colors = {
+  primary: '#2E7D32',
+  background: '#F9FBF7',
+};
 
 export default function RootLayout() {
   const [session, setSession] = useState<Session | null>(null);
