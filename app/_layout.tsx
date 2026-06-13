@@ -1,52 +1,13 @@
-import { useEffect, useState } from 'react';
-import { Slot, useRouter, useSegments } from 'expo-router';
-import { supabase } from '../lib/supabase';
-import { Session } from '@supabase/supabase-js';
-import { View, ActivityIndicator } from 'react-native';
+import '../styles/globals.css'
+import Navbar from '../components/Navbar'
 
-const Colors = {
-  primary: '#2E7D32',
-  background: '#F9FBF7',
-};
-
-export default function RootLayout() {
-  const [session, setSession] = useState<Session | null>(null);
-  const [loading, setLoading] = useState(true);
-  const router = useRouter();
-  const segments = useSegments();
-
-  useEffect(() => {
-    supabase.auth.getSession().then(({ data: { session } }: { data: { session: Session | null } }) => {
-      setSession(session);
-      setLoading(false);
-    });
-
-    const { data: { subscription } } = supabase.auth.onAuthStateChange(
-      (_event: string, session: Session | null) => {
-        setSession(session);
-      }
-    );
-
-    return () => subscription.unsubscribe();
-  }, []);
-
-  useEffect(() => {
-    if (loading) return;
-    const inAuth = segments[0] === '(auth)';
-    if (!session && !inAuth) {
-      router.replace('/(auth)/login');
-    } else if (session && inAuth) {
-      router.replace('/(app)/dashboard');
-    }
-  }, [session, loading, segments]);
-
-  if (loading) {
-    return (
-      <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center', backgroundColor: Colors.background }}>
-        <ActivityIndicator size="large" color={Colors.primary} />
-      </View>
-    );
-  }
-
-  return <Slot />;
+export default function RootLayout({ children }: { children: React.ReactNode }) {
+  return (
+    <html lang="en">
+      <body>
+        <Navbar />
+        <main>{children}</main>
+      </body>
+    </html>
+  )
 }
