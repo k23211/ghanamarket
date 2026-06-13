@@ -1,6 +1,5 @@
 'use client'
 import React from 'react'
-import { useTheme } from '../context/ThemeContext'
 
 function SunIcon() {
   return (
@@ -20,14 +19,9 @@ function MoonIcon() {
 }
 
 export default function Navbar() {
-  const { theme, toggle } = useTheme()
-
   return (
     <header className="navbar">
       <div className="brand">Agriquex</div>
-      <button aria-label="Toggle theme" className="theme-toggle" onClick={toggle}>
-        {theme === 'light' ? <MoonIcon /> : <SunIcon />}
-      </button>
     </header>
   )
 }
