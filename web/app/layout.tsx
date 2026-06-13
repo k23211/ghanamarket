@@ -6,6 +6,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
     <html lang="en">
       <head>
         <meta name="google-site-verification" content="tHHlkzvmkq4lc-KQeBSf1sdMxlnDLsK50XpWDyxGH58" />
+        <meta name="google-site-verification" content="googlef74db5955c5759f9" />
       </head>
       <body>
         <Navbar />
